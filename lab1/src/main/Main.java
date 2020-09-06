@@ -20,10 +20,8 @@ public class Main {
         try (MulticastSocket socket = new MulticastSocket(port)) {
 
             InetAddress hostInetAddress = InetAddress.getLocalHost();
-            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getByName("192.168.0.100"));
-            SocketAddress group = new InetSocketAddress(InetAddress.getByName(args[0]), port);
-
-            socket.joinGroup(group, networkInterface);
+            InetAddress group = InetAddress.getByName(args[0]);
+            socket.joinGroup(group);
             socket.setLoopbackMode(false);
             socket.setSoTimeout(receivingTimeout);
 
@@ -35,7 +33,7 @@ public class Main {
                 Long currentTime = System.currentTimeMillis();
                 if(currentTime - lastPingTime > pingFrequency) {
                     sendBuf = hostInetAddress.toString().getBytes();
-                    DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group);
+                    DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group, port);
                     socket.send(sendPacket);
                     lastPingTime = currentTime;
                 }
@@ -43,6 +41,7 @@ public class Main {
                 DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
                 try {
                     socket.receive(recvPacket);
+                    System.out.println(recvPacket.getSocketAddress());
                     String received = new String(recvPacket.getData(), 0, recvPacket.getLength());
                     lastReceivedMessageTime.put(received, System.currentTimeMillis());
                 } catch(IOException ex) {
