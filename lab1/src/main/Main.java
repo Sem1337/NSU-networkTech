@@ -11,7 +11,7 @@ public class Main {
             return;
         }
 
-        int port = 50000;
+        int port = 1337;
         long timeout = 3000L;
         long pingFrequency = 1000L;
         int receivingTimeout = 1500;
