@@ -35,12 +35,17 @@ public class Main {
                     sendBuf = hostInetAddress.toString().getBytes();
                     DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group, 1337);
                     sendSocket.send(sendPacket);
+                    lastPingTime = currentTime;
                 }
 
                 DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
-                recvSocket.receive(recvPacket);
-                String received = new String(recvPacket.getData(), 0, recvPacket.getLength());
-                lastMessageTime.put(received, System.currentTimeMillis());
+                try {
+                    recvSocket.receive(recvPacket);
+                    String received = new String(recvPacket.getData(), 0, recvPacket.getLength());
+                    lastMessageTime.put(received, System.currentTimeMillis());
+                } catch(IOException ex) {
+                    System.out.println("no packets received");
+                }
                 System.out.println("----------------------------------------");
                 for (String ip: lastMessageTime.keySet()) {
                     System.out.println(ip);
