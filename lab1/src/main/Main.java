@@ -1,9 +1,7 @@
 package main;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.util.HashMap;
 
 public class Main {
@@ -12,45 +10,52 @@ public class Main {
             System.out.println("group ip expected");
             return;
         }
+
         long timeout = 3000L;
         long pingFrequency = 1000L;
         int receivingTimeout = 1000;
         long lastPingTime = 0L;
 
-        try (MulticastSocket recvSocket = new MulticastSocket(1337); MulticastSocket sendSocket = new MulticastSocket(1338)) {
-            InetAddress group = InetAddress.getByName(args[0]);
-            recvSocket.joinGroup(group);
-            recvSocket.setLoopbackMode(false);
-            recvSocket.setSoTimeout(receivingTimeout);
-            sendSocket.joinGroup(group);
-            sendSocket.setLoopbackMode(false);
+        try (MulticastSocket socket = new MulticastSocket(1337)) {
+
             InetAddress hostInetAddress = InetAddress.getLocalHost();
+            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getByName("192.168.0.100"));
+            SocketAddress group = new InetSocketAddress(args[0], 1337);
+
+            socket.joinGroup(group, networkInterface);
+            socket.setLoopbackMode(false);
+            socket.setSoTimeout(receivingTimeout);
+
             byte[] recvBuf = new byte[256];
-            byte[] sendBuf = new byte[256];
-            HashMap<String, Long> lastMessageTime = new HashMap<>();
+            byte[] sendBuf;
+            HashMap<String, Long> lastReceivedMessageTime = new HashMap<>();
 
             while(true) {
                 Long currentTime = System.currentTimeMillis();
                 if(currentTime - lastPingTime > pingFrequency) {
                     sendBuf = hostInetAddress.toString().getBytes();
-                    DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group, 1337);
-                    sendSocket.send(sendPacket);
+                    DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group);
+                    socket.send(sendPacket);
                     lastPingTime = currentTime;
                 }
 
                 DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
                 try {
-                    recvSocket.receive(recvPacket);
+                    socket.receive(recvPacket);
                     String received = new String(recvPacket.getData(), 0, recvPacket.getLength());
-                    lastMessageTime.put(received, System.currentTimeMillis());
+                    lastReceivedMessageTime.put(received, System.currentTimeMillis());
                 } catch(IOException ex) {
                     System.out.println("no packets received");
                 }
+
+                //print list of connected hosts
                 System.out.println("----------------------------------------");
-                for (String ip: lastMessageTime.keySet()) {
+                for (String ip: lastReceivedMessageTime.keySet()) {
                     System.out.println(ip);
                 }
-                lastMessageTime.entrySet().removeIf(e -> currentTime - e.getValue() > timeout);
+
+                ///remove inactive hosts
+                lastReceivedMessageTime.entrySet().removeIf(e -> currentTime - e.getValue() > timeout);
             }
 
 
