@@ -11,16 +11,17 @@ public class Main {
             return;
         }
 
+        int port = 50000;
         long timeout = 3000L;
         long pingFrequency = 1000L;
-        int receivingTimeout = 1000;
+        int receivingTimeout = 1500;
         long lastPingTime = 0L;
 
-        try (MulticastSocket socket = new MulticastSocket(1337)) {
+        try (MulticastSocket socket = new MulticastSocket(port)) {
 
             InetAddress hostInetAddress = InetAddress.getLocalHost();
             NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getByName("192.168.0.100"));
-            SocketAddress group = new InetSocketAddress(args[0], 1337);
+            SocketAddress group = new InetSocketAddress(InetAddress.getByName(args[0]), port);
 
             socket.joinGroup(group, networkInterface);
             socket.setLoopbackMode(false);

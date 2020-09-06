@@ -8,6 +8,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="multicastUDP" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -50,7 +53,7 @@
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Main" />
       <module name="multicastUDP" />
-      <option name="PROGRAM_PARAMETERS" value="230.0.0.0" />
+      <option name="PROGRAM_PARAMETERS" value="224.0.0.0" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -75,7 +78,7 @@
       <workItem from="1599375016794" duration="685000" />
       <workItem from="1599378469610" duration="3754000" />
       <workItem from="1599383167445" duration="288000" />
-      <workItem from="1599383504260" duration="5581000" />
+      <workItem from="1599383504260" duration="11479000" />
     </task>
     <servers />
   </component>
