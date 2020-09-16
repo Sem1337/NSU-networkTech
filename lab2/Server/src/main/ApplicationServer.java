@@ -7,7 +7,6 @@ public class ApplicationServer {
             System.out.println("expected 1 arg: 'port'");
             return;
         }
-        System.out.println(Integer.parseInt(args[0]));
         Server server = new Server(Integer.parseInt(args[0]));
         server.runServer();
     }

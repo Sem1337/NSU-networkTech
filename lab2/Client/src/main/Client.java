@@ -3,6 +3,7 @@ package main;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.Paths;
 
 class Client {
 
@@ -21,6 +22,9 @@ class Client {
             DataOutputStream out = new DataOutputStream(serverDialog.getOutputStream());
             FileInputStream fileInputStream = new FileInputStream(path))
         {
+            File file = Paths.get(path).toFile();
+            out.writeUTF(file.getName());
+            out.writeLong(file.length());
             int bufferSize = 8192;
             byte[] buffer = new byte[bufferSize];
             int bytesRead;

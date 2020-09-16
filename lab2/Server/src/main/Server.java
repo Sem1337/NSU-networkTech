@@ -13,7 +13,6 @@ class Server {
     private int port = 1337;
 
     Server(int port) {
-        System.out.println(port);
         this.port = port;
     }
 
@@ -24,7 +23,7 @@ class Server {
             System.out.println("Server socket created");
             while (!server.isClosed()) {
                 executeIt.execute(new ClientHandler(server.accept()));
-                System.out.print("Connection accepted");
+                System.out.println("Connection accepted");
             }
             executeIt.shutdown();
         } catch (IOException e) {

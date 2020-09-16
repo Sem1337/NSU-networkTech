@@ -2,12 +2,16 @@ package main;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Paths;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ClientHandler implements Runnable {
 
     private Socket clientDialog;
     private byte[] buffer;
+    private int speedCheckFrequencyMs = 3000;
     ClientHandler(Socket client) {
         clientDialog = client;
         int bufferSize = 8192;
@@ -17,17 +21,33 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(new File("uploads/file" + new Random(10).toString() + ".jpg"))) {
-            DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream());
+        try {
             DataInputStream in = new DataInputStream(clientDialog.getInputStream());
+
+            String fileName = in.readUTF();
+            System.out.println("fileName = " + fileName);
+
+            long bytesInFile = in.readLong();
+            System.out.println("size = " + bytesInFile);
+
+            while(new File("uploads/" + fileName).exists())fileName = "1".concat(fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream("uploads/" + fileName);
+
             int bytesRead;
+            long lastCheckedBytes = 0;
+            long totalBytes = 0;
+
+            
+
             while ( (bytesRead = in.read(buffer)) != -1) {
-                System.out.println(bytesRead);
+                totalBytes += bytesRead;
                 fileOutputStream.write(buffer, 0, bytesRead);
+
             }
+
+
             System.out.println("Client disconnected");
             in.close();
-            out.close();
             clientDialog.close();
             System.out.println("Channels closed");
         } catch (IOException e) {
