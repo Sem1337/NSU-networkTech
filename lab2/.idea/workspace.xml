@@ -40,14 +40,26 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.0" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\programm\code\Java\network\NSU-networkTech\lab2\Client" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager" selected="Application.ApplicationServer">
     <configuration name="ApplicationClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -84,8 +96,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ApplicationClient" />
         <item itemvalue="Application.ApplicationServer" />
+        <item itemvalue="Application.ApplicationClient" />
       </list>
     </recent_temporary>
   </component>

@@ -2,6 +2,8 @@ package main;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Timer;
@@ -22,16 +24,20 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-
-        try {
-            DataInputStream in = new DataInputStream(clientDialog.getInputStream());
-            DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream());
+        FileOutputStream fileOutputStream = null;
+        try (DataInputStream in = new DataInputStream(clientDialog.getInputStream());
+             DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream()))
+        {
 
             String fileName = in.readUTF();
             long fileSizeBytes = in.readLong();
 
+            Path path = Paths.get("uploads");
+            if(!Files.exists(path)) {
+                new File(path.toString()).mkdir();
+            }
             while(new File("uploads/" + fileName).exists())fileName = "1".concat(fileName);
-            FileOutputStream fileOutputStream = new FileOutputStream("uploads/" + fileName);
+            fileOutputStream = new FileOutputStream("uploads/" + fileName);
 
             int bytesRead = 0;
             long totalBytesReceived = 0;
@@ -40,7 +46,7 @@ public class ClientHandler implements Runnable {
             class SpeedChecker implements Runnable {
                 private long totalBytesReceived = 0;
                 private long previousBytesReceivedValue = 0;
-                public void setTotalBytesReceived(long value) {
+                private void setTotalBytesReceived(long value) {
                     this.totalBytesReceived = value;
                 }
 
@@ -63,6 +69,7 @@ public class ClientHandler implements Runnable {
                                 previousBytesReceivedValue = totalBytesReceived;
                                 previousTime = currentTime;
                             }
+                            System.out.println(id + " client : completed");
                         }
                     } catch(InterruptedException ex) {
                         Thread.currentThread().interrupt();
@@ -95,12 +102,22 @@ public class ClientHandler implements Runnable {
                 out.writeUTF("Error: " + totalBytesReceived + " bytes received, " + fileSizeBytes + " bytes expected");
             }
 
-            fileOutputStream.close();
-            in.close();
-            out.close();
-            clientDialog.close();
+
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
+        } finally {
+            try {
+                if (fileOutputStream != null) fileOutputStream.close();
+            } catch (IOException ex) {
+                System.out.println(ex.getLocalizedMessage());
+            }
+
+            try {
+                if (fileOutputStream != null) clientDialog.close();
+            } catch (IOException ex) {
+                System.out.println(ex.getLocalizedMessage());
+            }
+
         }
     }
 }
