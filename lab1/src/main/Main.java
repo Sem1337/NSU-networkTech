@@ -3,6 +3,7 @@ package main;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,6 +17,7 @@ public class Main {
         long pingFrequency = 1000L;
         int receivingTimeout = 1500;
         long lastPingTime = 0L;
+        UUID id = UUID.randomUUID();
 
         try (MulticastSocket socket = new MulticastSocket(port)) {
 
@@ -32,7 +34,7 @@ public class Main {
             while(true) {
                 Long currentTime = System.currentTimeMillis();
                 if(currentTime - lastPingTime > pingFrequency) {
-                    sendBuf = hostInetAddress.toString().getBytes();
+                    sendBuf = (id.toString() + "   |   " + hostInetAddress.toString()).getBytes();
                     DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, group, port);
                     socket.send(sendPacket);
                     lastPingTime = currentTime;
@@ -41,7 +43,6 @@ public class Main {
                 DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
                 try {
                     socket.receive(recvPacket);
-                    System.out.println(recvPacket.getSocketAddress());
                     String received = new String(recvPacket.getData(), 0, recvPacket.getLength());
                     lastReceivedMessageTime.put(received, System.currentTimeMillis());
                 } catch(IOException ex) {
