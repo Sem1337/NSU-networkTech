@@ -17,12 +17,13 @@ class Server {
     }
 
     void runServer() {
+        int nextId = 1;
         try (ServerSocket server = new ServerSocket(port);
              BufferedReader br = new BufferedReader(new InputStreamReader(System.in)))
         {
             System.out.println("Server socket created");
             while (!server.isClosed()) {
-                executeIt.execute(new ClientHandler(server.accept()));
+                executeIt.execute(new ClientHandler(server.accept(), nextId++));
                 System.out.println("Connection accepted");
             }
             executeIt.shutdown();

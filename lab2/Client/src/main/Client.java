@@ -32,10 +32,14 @@ class Client {
                 out.write(buffer, 0, bytesRead);
                 out.flush();
             }
-            System.out.println("client disconnected");
+
+            String transferStatus = in.readUTF();
+            System.out.println(transferStatus);
         } catch (IOException ex) {
             System.out.println(ex.getLocalizedMessage());
         }
     }
+
+
 
 }

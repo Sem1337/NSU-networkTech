@@ -12,7 +12,9 @@ public class ClientHandler implements Runnable {
     private Socket clientDialog;
     private byte[] buffer;
     private int speedCheckFrequencyMs = 3000;
-    ClientHandler(Socket client) {
+    private int id;
+    ClientHandler(Socket client, int id) {
+        this.id = id;
         clientDialog = client;
         int bufferSize = 8192;
         buffer = new byte[bufferSize];
@@ -23,33 +25,80 @@ public class ClientHandler implements Runnable {
 
         try {
             DataInputStream in = new DataInputStream(clientDialog.getInputStream());
+            DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream());
 
             String fileName = in.readUTF();
-            System.out.println("fileName = " + fileName);
-
-            long bytesInFile = in.readLong();
-            System.out.println("size = " + bytesInFile);
+            long fileSizeBytes = in.readLong();
 
             while(new File("uploads/" + fileName).exists())fileName = "1".concat(fileName);
             FileOutputStream fileOutputStream = new FileOutputStream("uploads/" + fileName);
 
-            int bytesRead;
-            long lastCheckedBytes = 0;
-            long totalBytes = 0;
+            int bytesRead = 0;
+            long totalBytesReceived = 0;
 
-            
 
-            while ( (bytesRead = in.read(buffer)) != -1) {
-                totalBytes += bytesRead;
+            class SpeedChecker implements Runnable {
+                private long totalBytesReceived = 0;
+                private long previousBytesReceivedValue = 0;
+                public void setTotalBytesReceived(long value) {
+                    this.totalBytesReceived = value;
+                }
+
+                @Override
+                public void run() {
+                    long transferStartTime = System.currentTimeMillis();
+                    long currentTime;
+                    long previousTime = transferStartTime;
+                    try {
+                        synchronized (this) {
+                            while (!Thread.currentThread().isInterrupted() && totalBytesReceived < fileSizeBytes) {
+                                this.wait(speedCheckFrequencyMs);
+                                currentTime = System.currentTimeMillis();
+                                double secondsSinceStart = ((double)currentTime - transferStartTime) / 1000.0;
+                                double totalMBytesReceived = (double)totalBytesReceived / (1024*1024);
+                                double recentMBytesReceived = (double)(totalBytesReceived - previousBytesReceivedValue) / (1024*1024);
+                                System.out.println(id + " client : average " + totalMBytesReceived / secondsSinceStart + " MB/sec");
+                                double secondSinceLastSpeedCheck = (double)(currentTime - previousTime) / 1000;
+                                System.out.println(id + " client : current " + recentMBytesReceived / secondSinceLastSpeedCheck + " MB/sec");
+                                previousBytesReceivedValue = totalBytesReceived;
+                                previousTime = currentTime;
+                            }
+                        }
+                    } catch(InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+            SpeedChecker speedChecker = new SpeedChecker();
+            Thread speedCheckThread = new Thread(speedChecker);
+            speedCheckThread.start();
+
+            while (totalBytesReceived < fileSizeBytes && (bytesRead = in.read(buffer)) != -1) {
+                totalBytesReceived += bytesRead;
                 fileOutputStream.write(buffer, 0, bytesRead);
-
+                speedChecker.setTotalBytesReceived(totalBytesReceived);
             }
 
+            synchronized (speedChecker) {
+                speedChecker.notify();
+            }
 
-            System.out.println("Client disconnected");
+            try {
+                speedCheckThread.join();
+            } catch (InterruptedException ex) {
+                 speedCheckThread.interrupt();
+            }
+
+            if (totalBytesReceived == fileSizeBytes) {
+                out.writeUTF("successful transfer");
+            } else {
+                out.writeUTF("Error: " + totalBytesReceived + " bytes received, " + fileSizeBytes + " bytes expected");
+            }
+
+            fileOutputStream.close();
             in.close();
+            out.close();
             clientDialog.close();
-            System.out.println("Channels closed");
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
