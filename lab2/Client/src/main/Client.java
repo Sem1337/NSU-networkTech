@@ -8,20 +8,32 @@ import java.nio.file.Paths;
 class Client {
 
     private InetAddress serverAddr;
-    private int port = 1337;
+    private int port;
 
     Client(String addr, int port) throws IOException {
         this.serverAddr = InetAddress.getByName(addr);
         this.port = port;
-
     }
 
     void sendFile(String path) {
+
+
+
+
         try(Socket serverDialog = new Socket(serverAddr, port);
             DataInputStream in = new DataInputStream(serverDialog.getInputStream());
             DataOutputStream out = new DataOutputStream(serverDialog.getOutputStream());
             FileInputStream fileInputStream = new FileInputStream(path))
         {
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    serverDialog.close();
+                }catch (IOException ex) {
+                    System.out.println(ex.getLocalizedMessage());
+                }
+            }));
+
             File file = Paths.get(path).toFile();
             out.writeUTF(file.getName());
             out.writeLong(file.length());

@@ -5,9 +5,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class ClientHandler implements Runnable {
 
@@ -49,7 +47,11 @@ public class ClientHandler implements Runnable {
                 private void setTotalBytesReceived(long value) {
                     this.totalBytesReceived = value;
                 }
-
+                private boolean status = true;
+                private void finish() {
+                    System.out.println("stopped");
+                    status = false;
+                }
                 @Override
                 public void run() {
                     long transferStartTime = System.currentTimeMillis();
@@ -57,7 +59,7 @@ public class ClientHandler implements Runnable {
                     long previousTime = transferStartTime;
                     try {
                         synchronized (this) {
-                            while (!Thread.currentThread().isInterrupted() && totalBytesReceived < fileSizeBytes) {
+                            while (!Thread.currentThread().isInterrupted() && status) {
                                 this.wait(speedCheckFrequencyMs);
                                 currentTime = System.currentTimeMillis();
                                 double secondsSinceStart = ((double)currentTime - transferStartTime) / 1000.0;
@@ -76,6 +78,7 @@ public class ClientHandler implements Runnable {
                     }
                 }
             }
+
             SpeedChecker speedChecker = new SpeedChecker();
             Thread speedCheckThread = new Thread(speedChecker);
             speedCheckThread.start();
@@ -86,14 +89,11 @@ public class ClientHandler implements Runnable {
                 speedChecker.setTotalBytesReceived(totalBytesReceived);
             }
 
-            synchronized (speedChecker) {
-                speedChecker.notify();
-            }
+            System.out.println("here");
+            speedChecker.finish();
 
-            try {
-                speedCheckThread.join();
-            } catch (InterruptedException ex) {
-                 speedCheckThread.interrupt();
+            synchronized (speedChecker) {
+                speedChecker.notifyAll();
             }
 
             if (totalBytesReceived == fileSizeBytes) {

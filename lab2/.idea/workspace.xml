@@ -13,6 +13,7 @@
       <change beforePath="$PROJECT_DIR$/uploads/file.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/uploads/file.jpg1" beforeDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -117,6 +118,7 @@
       <workItem from="1600238494004" duration="334000" />
       <workItem from="1600323343491" duration="3377000" />
       <workItem from="1600432336809" duration="2607000" />
+      <workItem from="1600605071322" duration="2565000" />
     </task>
     <servers />
   </component>

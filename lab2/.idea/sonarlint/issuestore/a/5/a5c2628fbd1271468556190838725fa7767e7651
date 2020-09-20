@@ -1,0 +1,14 @@
+
+M
+java:S1128
+"0Remove this unused import 'java.util.TimerTask'.(àÀÇÙ8ªı”ØÊ.
+o
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(“–ış8 ¤ÙÊ.
+R
+java:S2446Z"0"notify" may not wake up the appropriate thread.(Ã¼„Ÿúÿÿÿÿ8ªı”ØÊ.
+O
+java:S1128"-Remove this unused import 'java.util.Random'.(èøÉ›ùÿÿÿÿ8ªı”ØÊ.
+N
+java:S1128	",Remove this unused import 'java.util.Timer'.(†£ñáÿÿÿÿÿ8ªı”ØÊ.
+W
+java:S1141]"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ªı”ØÊ.

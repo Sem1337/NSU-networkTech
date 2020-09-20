@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 class Server {
 
     private static ExecutorService executeIt = Executors.newFixedThreadPool(5);
-    private int port = 1337;
+    private int port;
 
     Server(int port) {
         this.port = port;
