@@ -10,5 +10,4 @@ public class ApplicationServer {
         Server server = new Server(Integer.parseInt(args[0]));
         server.runServer();
     }
-
 }

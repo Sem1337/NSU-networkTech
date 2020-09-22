@@ -16,24 +16,11 @@ class Client {
     }
 
     void sendFile(String path) {
-
-
-
-
         try(Socket serverDialog = new Socket(serverAddr, port);
             DataInputStream in = new DataInputStream(serverDialog.getInputStream());
             DataOutputStream out = new DataOutputStream(serverDialog.getOutputStream());
             FileInputStream fileInputStream = new FileInputStream(path))
         {
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    serverDialog.close();
-                }catch (IOException ex) {
-                    System.out.println(ex.getLocalizedMessage());
-                }
-            }));
-
             File file = Paths.get(path).toFile();
             out.writeUTF(file.getName());
             out.writeLong(file.length());
@@ -51,7 +38,5 @@ class Client {
             System.out.println(ex.getLocalizedMessage());
         }
     }
-
-
 
 }

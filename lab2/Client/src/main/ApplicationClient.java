@@ -15,6 +15,5 @@ public class ApplicationClient {
         } catch (IOException ex) {
             System.out.println(ex.getLocalizedMessage());
         }
-
     }
 }

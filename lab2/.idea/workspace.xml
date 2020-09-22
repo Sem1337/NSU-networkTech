@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Client:jar" />
+      <artifact name="Server:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="4924fb50-c1c1-4061-b2ea-298663a252ba" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -40,10 +46,10 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Client" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -65,7 +71,7 @@
   <component name="RunManager" selected="Application.ApplicationServer">
     <configuration name="ApplicationClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.ApplicationClient" />
-      <module name="lab2" />
+      <module name="Client" />
       <option name="PROGRAM_PARAMETERS" value="C:\Users\semen\Documents\Java\net\files\file.exe 127.0.0.1 1337" />
       <extension name="coverage">
         <pattern>
@@ -79,7 +85,7 @@
     </configuration>
     <configuration name="ApplicationServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.ApplicationServer" />
-      <module name="lab2" />
+      <module name="Server" />
       <option name="PROGRAM_PARAMETERS" value="1337" />
       <extension name="coverage">
         <pattern>
@@ -118,7 +124,8 @@
       <workItem from="1600238494004" duration="334000" />
       <workItem from="1600323343491" duration="3377000" />
       <workItem from="1600432336809" duration="2607000" />
-      <workItem from="1600605071322" duration="2565000" />
+      <workItem from="1600605071322" duration="5448000" />
+      <workItem from="1600760155345" duration="3714000" />
     </task>
     <servers />
   </component>
