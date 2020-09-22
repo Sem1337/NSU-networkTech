@@ -23,7 +23,7 @@ public class ClientHandler implements Runnable {
     }
 
     private String getTransferState() {
-        return totalBytesReceived + "/" + fileSizeBytes + " bytes received";
+        return id + " client state: " + totalBytesReceived + "/" + fileSizeBytes + " bytes received";
     }
 
     class SpeedChecker implements Runnable {
