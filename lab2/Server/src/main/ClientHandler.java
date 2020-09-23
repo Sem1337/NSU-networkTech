@@ -80,6 +80,7 @@ public class ClientHandler implements Runnable {
              DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream()))
         {
             String fileName = in.readUTF();
+            System.out.println(fileName);
             fileSizeBytes = in.readLong();
             Path path = Paths.get("uploads");
             if(!Files.exists(path)) {

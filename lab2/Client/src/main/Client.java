@@ -3,6 +3,8 @@ package main;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class Client {
@@ -16,6 +18,12 @@ class Client {
     }
 
     void sendFile(String path) {
+
+        if(!Files.exists(Paths.get(path))) {
+            System.out.println("file doesn't exist");
+            return;
+        }
+
         try(Socket serverDialog = new Socket(serverAddr, port);
             DataInputStream in = new DataInputStream(serverDialog.getInputStream());
             DataOutputStream out = new DataOutputStream(serverDialog.getOutputStream());
