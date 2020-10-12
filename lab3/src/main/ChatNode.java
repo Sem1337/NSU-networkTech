@@ -71,18 +71,21 @@ class ChatNode {
 
     }
 
-    ChatNode(String name, int port, int packetLoss) {
+    ChatNode(String name, int packetLoss, int port) {
         this.name = name;
+        System.out.println(port);
         try {
             socket = new DatagramSocket(port);
+            System.out.println(socket.getPort());
+
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
         this.packetLoss = packetLoss;
     }
 
-    ChatNode(String name, int port, int packetLoss, String neighbourIP, int neighbourPort) {
-        this(name,port,packetLoss);
+    ChatNode(String name, int packetLoss, int port, String neighbourIP, int neighbourPort) {
+        this(name, packetLoss, port);
         try {
             Neighbour neighbour = new Neighbour(InetAddress.getByName(neighbourIP), neighbourPort);
             neighbours.put(neighbour.getId(), neighbour);
@@ -217,8 +220,13 @@ class ChatNode {
                 do {
                     Long sendingTime = System.currentTimeMillis();
                     //if(!packetLoss()) {
-                        socket.send(packet);
-                    System.out.println("send");
+                   // System.out.println(packet.getAddress());
+                    //System.out.println(packet.getPort());
+                    socket.send(packet);
+                    //System.out.println(socket.getInetAddress());
+                    //System.out.println(socket.getLocalAddress());
+                    System.out.println(socket.getPort());
+                    //System.out.println("send");
                     //}
                     if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
                         System.out.println("qqqq");
