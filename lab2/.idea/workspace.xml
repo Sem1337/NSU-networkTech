@@ -8,13 +8,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4924fb50-c1c1-4061-b2ea-298663a252ba" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/main/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/main/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/main/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/main/ClientHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/Client_jar/Client.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/Client_jar/Client.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/Server_jar/Server.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/Server_jar/Server.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/main/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/main/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab2/main/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab2/main/Client.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab2/main/ClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab2/main/ClientHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab2/main/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab2/main/Server.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/1file.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/file.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/file.jpg1" beforeDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,8 +46,8 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Client" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -51,39 +56,23 @@
       <recent name="D:\programm\code\Java\network\NSU-networkTech\lab2\Client" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ApplicationClient">
-    <configuration name="ApplicationClient (1)" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="main.ApplicationClient" />
-      <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="C:\Users\semen\Documents\Java\net\files\file.exe 127.0.0.1 1337" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="main.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ApplicationClient (2)" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="main.ApplicationClient" />
-      <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="C:\Users\semen\Documents\Java\net\files\file.exe 127.0.0.1 1337" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="main.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.ApplicationServer">
     <configuration name="ApplicationClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.ApplicationClient" />
       <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="C:\Users\semen\Documents\Java\net\files\file1234.exe 127.0.0.1 1337" />
+      <option name="PROGRAM_PARAMETERS" value="C:\Users\semen\Documents\Java\net\files\file.exe 127.0.0.1 1337" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.*" />
@@ -110,14 +99,12 @@
     </configuration>
     <list>
       <item itemvalue="Application.ApplicationClient" />
-      <item itemvalue="Application.ApplicationClient (1)" />
-      <item itemvalue="Application.ApplicationClient (2)" />
       <item itemvalue="Application.ApplicationServer" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ApplicationClient" />
         <item itemvalue="Application.ApplicationServer" />
+        <item itemvalue="Application.ApplicationClient" />
       </list>
     </recent_temporary>
   </component>
@@ -138,8 +125,10 @@
       <workItem from="1600323343491" duration="3377000" />
       <workItem from="1600432336809" duration="2607000" />
       <workItem from="1600605071322" duration="5448000" />
-      <workItem from="1600760155345" duration="4366000" />
-      <workItem from="1600840069110" duration="3044000" />
+      <workItem from="1600760155345" duration="5289000" />
+      <workItem from="1600783321870" duration="3163000" />
+      <workItem from="1600788635541" duration="32000" />
+      <workItem from="1602496052105" duration="617000" />
     </task>
     <servers />
   </component>
@@ -160,10 +149,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600841876379">
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600594638428">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1600841876379" />
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1600594638428" />
     <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser" timestamp="1600324674325">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -176,30 +165,26 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1600238828824" />
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1600843142546">
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1600595452938">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1600843142546" />
-    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1600843142546">
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1600595452938" />
+    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1600595452938">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1600843142546" />
-    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1600843142546">
+    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1600595452938" />
+    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1600595452938">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1600843142546" />
-    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1600843142546">
+    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1600595452938" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1600595452938">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1600843142546" />
-    <state x="249" y="0" key="SettingsEditor" timestamp="1600764740730">
+    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1600595452938" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1600593121868">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="249" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1600764740730" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1600840109760">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1600840109760" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1600593121868" />
     <state x="209" y="33" key="new project wizard" timestamp="1600237995569">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
