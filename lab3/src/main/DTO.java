@@ -55,7 +55,7 @@ public class DTO implements Serializable {
 
     @Override
     public String toString() {
-        return id.toString() + ": (" + header + " from " + senderName + "): " + data;
+        return id.toString() + ": (header:" + header + ", from: " + senderName + "): " + data;
     }
 
 }

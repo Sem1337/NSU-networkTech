@@ -55,7 +55,6 @@ class ChatNode {
                 DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
                 recvSocket.receive(packet);
                 handleResponse(packet);
-
             }
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
@@ -69,10 +68,11 @@ class ChatNode {
             fromNeighbour = new Neighbour(packet.getAddress(), packet.getPort());
             neighbours.put(fromId, fromNeighbour);
         }
-        try(ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.getData());
-        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
-            DTO dto = (DTO) objectInputStream.readObject();
+        try(    ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.getData());
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)    ) {
 
+            DTO dto = (DTO) objectInputStream.readObject();
+            System.out.println(dto.toString());
 
             Integer monitor = fromNeighbour.getMonitor(dto.getId());
             if(monitor != null) {
@@ -80,8 +80,6 @@ class ChatNode {
                     monitor.notifyAll();
                 }
             }
-            System.out.println(dto.toString());
-            System.out.println(packet.getAddress());
             switch (dto.getHeader()) {
                 case "connect":
                     fromNeighbour.setName(dto.getMessage());
@@ -163,7 +161,6 @@ class ChatNode {
                 oo.writeObject(dto);
                 sendBuffer = outputStream.toByteArray();
                 DatagramPacket packet = new DatagramPacket(sendBuffer, sendBuffer.length, receiver.getIp(), receiver.getPort());
-                System.out.println("sending to: " + packet.getAddress());
                 boolean disconnect = false;
                 long startWaitingTime = System.currentTimeMillis();
                 do {
@@ -173,23 +170,17 @@ class ChatNode {
                     recvSocket.send(packet);
                     //}
                     if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
-                        System.out.println("don't waiting for response or got response");
                         break;
                     } else if (System.currentTimeMillis() -  startWaitingTime > timeoutToDisconnect) {  // to much
-                        System.out.println("waiting to much!!");
                         disconnect = true;
                         break;
                     }
                 } while(true);
                 if(disconnect) {
-                    System.out.println("disconnect");
                     disconnectNeighbour(receiver);
                 } else {
-                    System.out.println("confirmed");
                     receiver.removeMessage(dto.getId());
                 }
-
-
             } catch (IOException e) {
                 System.out.println(e.getLocalizedMessage());
             }
@@ -201,7 +192,6 @@ class ChatNode {
         }
 
         private boolean waitingResponse(Long sendingTime, UUID id) {         // false if waiting too long
-            System.out.println("waiting");
             Integer monitor = receiver.getMonitor(id);
             synchronized (monitor) {
                 int timeout = 1500;
@@ -210,7 +200,6 @@ class ChatNode {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                System.out.println("waited for: " + (System.currentTimeMillis() - sendingTime));
                 return System.currentTimeMillis() - sendingTime < timeout;
             }
         }
@@ -221,12 +210,11 @@ class ChatNode {
 
 
     static class Neighbour {
-
-        private UUID id;                                         // uid of neighbour for that node
+        private UUID id;
         private int port;
         private InetAddress ip;
         private String name;
-        Map<UUID, Integer> messageMonitors = new HashMap<>();    // list of sent messages to that neighbour
+        Map<UUID, Integer> messageMonitors = new HashMap<>();// list of sent messages to that neighbour with their synchronization monitors
         Set<UUID> successfulSentMessages = new HashSet<>();
 
         Neighbour(InetAddress ip, int port) {
