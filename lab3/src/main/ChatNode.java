@@ -165,10 +165,9 @@ class ChatNode {
                 long startWaitingTime = System.currentTimeMillis();
                 do {
                     Long sendingTime = System.currentTimeMillis();
-                    //if(!packetLoss()) {
-                    //receiver.getSocket().send(packet);
-                    recvSocket.send(packet);
-                    //}
+                    if(!packetLoss()) {
+                        recvSocket.send(packet);
+                    }
                     if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
                         break;
                     } else if (System.currentTimeMillis() -  startWaitingTime > timeoutToDisconnect) {  // to much
