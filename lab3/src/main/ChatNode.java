@@ -11,8 +11,8 @@ class ChatNode {
     private int packetLoss;
     private int timeoutToDisconnect = 5000;
     private Map<UUID,Neighbour> neighbours = new HashMap<>();
-    private DatagramSocket socket;
-    private Set<UUID> receivedMessages = new HashSet<>();
+    private DatagramSocket recvSocket;
+    //private Set<UUID> receivedMessages = new HashSet<>();
 
 
     static class Neighbour {
@@ -23,13 +23,25 @@ class ChatNode {
         private String name;
         Map<UUID, Integer> messageMonitors = new HashMap<>();    // list of sent messages to that neighbour
         Set<UUID> successfulSentMessages = new HashSet<>();
+        //DatagramSocket sendSocket;
 
         Neighbour(InetAddress ip, int port) {
             this.ip = ip;
             this.port = port;
+           /* try {
+                //System.out.println(this.ip);
+                //sendSocket = new DatagramSocket(port);
+                //System.out.println(socket.getPort());
+            } catch (SocketException e) {
+                System.out.println(e.getLocalizedMessage());
+            }*/
             this.name = "Unknown";
             id = UUID.nameUUIDFromBytes((this.ip.toString() + this.port).getBytes());
         }
+
+        /*DatagramSocket getSocket() {
+            return sendSocket;
+        }*/
 
         UUID getId() {
             return id;
@@ -73,10 +85,8 @@ class ChatNode {
 
     ChatNode(String name, int packetLoss, int port) {
         this.name = name;
-        System.out.println(port);
         try {
-            socket = new DatagramSocket(port);
-            System.out.println(socket.getPort());
+            recvSocket = new DatagramSocket(port);
 
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
@@ -107,12 +117,12 @@ class ChatNode {
     }
 
     private void startReceiving() {
-        int maxDatagramSize = 256;
+        int maxDatagramSize = 512;
         byte[] recvBuffer = new byte[maxDatagramSize];
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
-                socket.receive(packet);
+                recvSocket.receive(packet);
                 handleResponse(packet);
 
             }
@@ -131,6 +141,7 @@ class ChatNode {
         try(ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.getData());
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             DTO dto = (DTO) objectInputStream.readObject();
+
 
             Integer monitor = fromNeighbour.getMonitor(dto.getId());
             if(monitor != null) {
@@ -214,30 +225,25 @@ class ChatNode {
                 oo.writeObject(dto);
                 sendBuffer = outputStream.toByteArray();
                 DatagramPacket packet = new DatagramPacket(sendBuffer, sendBuffer.length, receiver.getIp(), receiver.getPort());
-
+                System.out.println("sending to: " + packet.getAddress());
                 boolean disconnect = false;
-                Long startWaitingTime = System.currentTimeMillis();
+                long startWaitingTime = System.currentTimeMillis();
                 do {
                     Long sendingTime = System.currentTimeMillis();
                     //if(!packetLoss()) {
-                   // System.out.println(packet.getAddress());
-                    //System.out.println(packet.getPort());
-                    socket.send(packet);
-                    //System.out.println(socket.getInetAddress());
-                    //System.out.println(socket.getLocalAddress());
-                    System.out.println(socket.getPort());
-                    //System.out.println("send");
+                    recvSocket.send(packet);
                     //}
                     if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
-                        System.out.println("qqqq");
+                        System.out.println("don't waiting for response or got response");
                         break;
                     } else if (System.currentTimeMillis() -  startWaitingTime > timeoutToDisconnect) {  // to much
+                        System.out.println("waiting to much!!");
                         disconnect = true;
                         break;
                     }
                 } while(true);
                 if(disconnect) {
-                    System.out.println("disc");
+                    System.out.println("disconnect");
                     disconnectNeighbour(receiver);
                 } else {
                     System.out.println("confirmed");
