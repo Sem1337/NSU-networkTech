@@ -23,6 +23,10 @@ public class DTO implements Serializable {
         this.type = type;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
 
     public Type getType() {
         return type;

@@ -12,76 +12,7 @@ class ChatNode {
     private int timeoutToDisconnect = 5000;
     private Map<UUID,Neighbour> neighbours = new HashMap<>();
     private DatagramSocket recvSocket;
-    //private Set<UUID> receivedMessages = new HashSet<>();
 
-
-    static class Neighbour {
-
-        private UUID id;                                         // uid of neighbour for that node
-        private int port;
-        private InetAddress ip;
-        private String name;
-        Map<UUID, Integer> messageMonitors = new HashMap<>();    // list of sent messages to that neighbour
-        Set<UUID> successfulSentMessages = new HashSet<>();
-        //DatagramSocket sendSocket;
-
-        Neighbour(InetAddress ip, int port) {
-            this.ip = ip;
-            this.port = port;
-           /* try {
-                //System.out.println(this.ip);
-                //sendSocket = new DatagramSocket(port);
-                //System.out.println(socket.getPort());
-            } catch (SocketException e) {
-                System.out.println(e.getLocalizedMessage());
-            }*/
-            this.name = "Unknown";
-            id = UUID.nameUUIDFromBytes((this.ip.toString() + this.port).getBytes());
-        }
-
-        /*DatagramSocket getSocket() {
-            return sendSocket;
-        }*/
-
-        UUID getId() {
-            return id;
-        }
-
-        void addSuccessfulSent(UUID id) {
-            successfulSentMessages.add(id);
-        }
-
-        boolean checkSuccessfulSent(UUID id) {
-            return successfulSentMessages.contains(id);
-        }
-
-        void addMessage(UUID id) {
-            messageMonitors.put(id, 1);
-        }
-
-        void removeMessage(UUID id) {
-            messageMonitors.remove(id);
-        }
-
-        Integer getMonitor(UUID id) {
-            return messageMonitors.get(id);
-        }
-
-        String getName() {
-            return name;
-        }
-        InetAddress getIp() {
-            return ip;
-        }
-        int getPort() {
-            return port;
-        }
-
-        void setName(String name) {
-            this.name = name;
-        }
-
-    }
 
     ChatNode(String name, int packetLoss, int port) {
         this.name = name;
@@ -99,7 +30,7 @@ class ChatNode {
         try {
             Neighbour neighbour = new Neighbour(InetAddress.getByName(neighbourIP), neighbourPort);
             neighbours.put(neighbour.getId(), neighbour);
-            sendMessageToOne("connect", name, Type.REQUEST, neighbour);
+            sendConnectionRequest(name, neighbour);
         } catch (UnknownHostException e) {
             System.out.println(e.getLocalizedMessage());
         }
@@ -111,7 +42,7 @@ class ChatNode {
         String message;
         while(!Thread.currentThread().isInterrupted()) {
             message = scanner.nextLine();
-            sendMessageToAll(message, Type.REQUEST);
+            sendMessageToAll(message);
         }
 
     }
@@ -150,16 +81,18 @@ class ChatNode {
                 }
             }
             System.out.println(dto.toString());
+            System.out.println(packet.getAddress());
             switch (dto.getHeader()) {
                 case "connect":
                     fromNeighbour.setName(dto.getMessage());
-                    sendMessageToOne("responseToConnect", name, Type.RESPONSE, fromNeighbour);
+
+                    sendResponseToNeighbour("responseToConnect", name, dto.getId(), fromNeighbour);
                     break;
                 case "responseToConnect":
                     fromNeighbour.setName(dto.getMessage());
                     break;
                 case "message":
-                    sendMessageToOne("received", dto.getId().toString(), Type.RESPONSE, fromNeighbour);                         // send confirmation of receiving message with particular id
+                    sendResponseToNeighbour("received", dto.getId().toString(), dto.getId(), fromNeighbour);                         // send confirmation of receiving message with particular id
                     sendMessageForwarding(dto, fromNeighbour);
                     break;
                 case "received":
@@ -172,11 +105,16 @@ class ChatNode {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getLocalizedMessage());
         }
-
     }
 
-    private void sendMessageToOne(String header, String data, Type type, Neighbour neighbour) {
-        DTO dto = new DTO(header, data, name, type);
+    private void sendResponseToNeighbour(String header, String data, UUID id, Neighbour neighbour) {
+        DTO dto = new DTO(header, data, name, Type.RESPONSE);
+        dto.setId(id);
+        new Thread(new Transmitter(dto, neighbour)).start();
+    }
+
+    private void sendConnectionRequest(String data, Neighbour neighbour) {
+        DTO dto = new DTO("connect", data, name, Type.REQUEST);
         new Thread(new Transmitter(dto, neighbour)).start();
     }
 
@@ -189,8 +127,8 @@ class ChatNode {
         }
     }
 
-    private void sendMessageToAll(String data, Type type) {
-        DTO dto = new DTO("message", data, name, type);
+    private void sendMessageToAll(String data) {
+        DTO dto = new DTO("message", data, name, Type.REQUEST);
         for (Neighbour  receiver: neighbours.values()) {
             new Thread(new Transmitter(dto, receiver)).start();
         }
@@ -231,6 +169,7 @@ class ChatNode {
                 do {
                     Long sendingTime = System.currentTimeMillis();
                     //if(!packetLoss()) {
+                    //receiver.getSocket().send(packet);
                     recvSocket.send(packet);
                     //}
                     if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
@@ -256,6 +195,11 @@ class ChatNode {
             }
         }
 
+        private void disconnectNeighbour(Neighbour neighbour) {
+            neighbours.remove(neighbour.getId());
+            System.out.println("didn't receive responses for " + 1.0 * timeoutToDisconnect / 1000 + " seconds. (" + neighbour.getName()+ ": " + neighbour.getName() + " disconnected)");
+        }
+
         private boolean waitingResponse(Long sendingTime, UUID id) {         // false if waiting too long
             System.out.println("waiting");
             Integer monitor = receiver.getMonitor(id);
@@ -266,16 +210,71 @@ class ChatNode {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+                System.out.println("waited for: " + (System.currentTimeMillis() - sendingTime));
                 return System.currentTimeMillis() - sendingTime < timeout;
             }
         }
     }
 
 
-    private void disconnectNeighbour(Neighbour neighbour) {
-        neighbours.remove(neighbour.getId());
-        System.out.println("didn't receive responses for " + 1.0 * timeoutToDisconnect / 1000 + " seconds. (" + neighbour.getName()+ ": " + neighbour.getName() + " disconnected)");
-    }
 
+
+
+    static class Neighbour {
+
+        private UUID id;                                         // uid of neighbour for that node
+        private int port;
+        private InetAddress ip;
+        private String name;
+        Map<UUID, Integer> messageMonitors = new HashMap<>();    // list of sent messages to that neighbour
+        Set<UUID> successfulSentMessages = new HashSet<>();
+
+        Neighbour(InetAddress ip, int port) {
+            this.ip = ip;
+            this.port = port;
+            this.name = "Unknown";
+            id = UUID.nameUUIDFromBytes((this.ip.toString() + this.port).getBytes());
+        }
+
+
+        UUID getId() {
+            return id;
+        }
+
+        void addSuccessfulSent(UUID id) {
+            successfulSentMessages.add(id);
+        }
+
+        boolean checkSuccessfulSent(UUID id) {
+            return successfulSentMessages.contains(id);
+        }
+
+        void addMessage(UUID id) {
+            messageMonitors.put(id, 1);
+        }
+
+        void removeMessage(UUID id) {
+            messageMonitors.remove(id);
+        }
+
+        Integer getMonitor(UUID id) {
+            return messageMonitors.get(id);
+        }
+
+        String getName() {
+            return name;
+        }
+        InetAddress getIp() {
+            return ip;
+        }
+        int getPort() {
+            return port;
+        }
+
+        void setName(String name) {
+            this.name = name;
+        }
+
+    }
 
 }
