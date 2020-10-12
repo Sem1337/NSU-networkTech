@@ -28,7 +28,7 @@ class ChatNode {
             this.ip = ip;
             this.port = port;
             this.name = "Unknown";
-            id = UUID.fromString(this.ip.toString() + this.port);
+            id = UUID.nameUUIDFromBytes((this.ip.toString() + this.port).getBytes());
         }
 
         UUID getId() {
@@ -119,7 +119,7 @@ class ChatNode {
     }
 
     private void handleResponse(DatagramPacket packet) {
-        UUID fromId = UUID.fromString(packet.getAddress().toString() + packet.getPort());
+        UUID fromId = UUID.nameUUIDFromBytes((packet.getAddress().toString() + packet.getPort()).getBytes());
         Neighbour fromNeighbour = neighbours.get(fromId);
         if(fromNeighbour == null) {
             fromNeighbour = new Neighbour(packet.getAddress(), packet.getPort());
@@ -148,7 +148,7 @@ class ChatNode {
                     sendMessageForwarding(dto, fromNeighbour);
                     break;
                 case "received":
-                    UUID whichMessageConfirmed = UUID.fromString(dto.getMessage());
+                    UUID whichMessageConfirmed = UUID.nameUUIDFromBytes(dto.getMessage().getBytes());
                     fromNeighbour.addSuccessfulSent(whichMessageConfirmed);
                     break;
                 default:
