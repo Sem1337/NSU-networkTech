@@ -135,6 +135,7 @@ class ChatNode {
                     monitor.notifyAll();
                 }
             }
+            System.out.println(dto.toString());
             switch (dto.getHeader()) {
                 case "connect":
                     fromNeighbour.setName(dto.getMessage());
@@ -203,31 +204,46 @@ class ChatNode {
         }
 
         private void sendMessageToNode(DTO dto, Neighbour receiver) {
-            if(packetLoss() || receiver.checkSuccessfulSent(dto.getId())) return;
+            if(receiver.checkSuccessfulSent(dto.getId())) return;
             receiver.addMessage(dto.getId());
             byte[] sendBuffer;
             try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); ObjectOutputStream oo = new ObjectOutputStream(outputStream)) {
                 oo.writeObject(dto);
                 sendBuffer = outputStream.toByteArray();
                 DatagramPacket packet = new DatagramPacket(sendBuffer, sendBuffer.length, receiver.getIp(), receiver.getPort());
-                Long sendingTime = System.currentTimeMillis();
 
+                boolean disconnect = false;
+                Long startWaitingTime = System.currentTimeMillis();
                 do {
-                    socket.send(packet);
-                } while(!dto.getType().equals(Type.RESPONSE) && waitingResponse(sendingTime, dto.getId()));
-
-                if(System.currentTimeMillis() -  sendingTime > timeoutToDisconnect) {
+                    Long sendingTime = System.currentTimeMillis();
+                    //if(!packetLoss()) {
+                        socket.send(packet);
+                    System.out.println("send");
+                    //}
+                    if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
+                        System.out.println("qqqq");
+                        break;
+                    } else if (System.currentTimeMillis() -  startWaitingTime > timeoutToDisconnect) {  // to much
+                        disconnect = true;
+                        break;
+                    }
+                } while(true);
+                if(disconnect) {
+                    System.out.println("disc");
                     disconnectNeighbour(receiver);
                 } else {
+                    System.out.println("confirmed");
                     receiver.removeMessage(dto.getId());
                 }
+
 
             } catch (IOException e) {
                 System.out.println(e.getLocalizedMessage());
             }
         }
 
-        private boolean waitingResponse(Long sendingTime, UUID id) {
+        private boolean waitingResponse(Long sendingTime, UUID id) {         // false if waiting too long
+            System.out.println("waiting");
             Integer monitor = receiver.getMonitor(id);
             synchronized (monitor) {
                 int timeout = 1500;
@@ -236,10 +252,8 @@ class ChatNode {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                return System.currentTimeMillis() - sendingTime <= timeout;
+                return System.currentTimeMillis() - sendingTime < timeout;
             }
-
-
         }
     }
 
