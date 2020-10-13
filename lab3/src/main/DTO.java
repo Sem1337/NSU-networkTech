@@ -3,24 +3,20 @@ package main;
 import java.io.Serializable;
 import java.util.UUID;
 
-enum Type {
-    RESPONSE,
-    REQUEST
-}
-
 public class DTO implements Serializable {
 
-    private Type type;
-    private String header;
+    private MessageType messageType;
+    private MessageHeader header;
     private UUID id = UUID.randomUUID();
     private String data;
     private String senderName;
 
-    DTO(String header, String data, String senderName, Type type) {
+
+    DTO(MessageHeader header, String data, String senderName, MessageType messageType) {
         this.header = header;
         this.data = data;
         this.senderName = senderName;
-        this.type = type;
+        this.messageType = messageType;
     }
 
     public void setId(UUID id) {
@@ -28,15 +24,15 @@ public class DTO implements Serializable {
     }
 
 
-    public Type getType() {
-        return type;
+    public MessageType getMessageType() {
+        return messageType;
     }
 
     public String getMessage() {
         return data;
     }
 
-    private String getSenderName() {
+    public String getSenderName() {
         return senderName;
     }
 
@@ -45,7 +41,7 @@ public class DTO implements Serializable {
         senderName = name;
     }
 
-    public String getHeader() {
+    public MessageHeader getHeader() {
         return header;
     }
 

@@ -4,6 +4,7 @@
     <list default="true" id="8f82ec7f-b8d7-4c01-9517-f39d6908b40b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +14,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -36,7 +38,7 @@
     <property name="android.sdk.path" value="$PROJECT_DIR$/../../../../androidSDK" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
@@ -46,11 +48,23 @@
       <recent name="main" />
     </key>
   </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
   <component name="RunManager" selected="Application.Application2">
     <configuration name="Application" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Sem 50 1337 192.168.0.100 55555" />
+      <option name="PROGRAM_PARAMETERS" value="Sem 10 55555" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.*" />
@@ -64,7 +78,7 @@
     <configuration name="Application2" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Sem3 50 55555 192.168.0.100 55555" />
+      <option name="PROGRAM_PARAMETERS" value="Sem 10 55555" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.*" />
@@ -98,6 +112,7 @@
       <workItem from="1602496673303" duration="17522000" />
       <workItem from="1602514800542" duration="6530000" />
       <workItem from="1602529845330" duration="942000" />
+      <workItem from="1602581723203" duration="7209000" />
     </task>
     <servers />
   </component>

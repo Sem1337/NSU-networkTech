@@ -9,16 +9,17 @@ class ChatNode {
 
     private String name;
     private int packetLoss;
-    private int timeoutToDisconnect = 5000;
+    private int timeoutToDisconnect = 15000;
+    private int port;
     private Map<UUID,Neighbour> neighbours = new HashMap<>();
     private DatagramSocket recvSocket;
-
+    private Neighbour delegate = null;
 
     ChatNode(String name, int packetLoss, int port) {
         this.name = name;
+        this.port = port;
         try {
             recvSocket = new DatagramSocket(port);
-
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
         }
@@ -81,38 +82,46 @@ class ChatNode {
                 }
             }
             switch (dto.getHeader()) {
-                case "connect":
-                    fromNeighbour.setName(dto.getMessage());
-
-                    sendResponseToNeighbour("responseToConnect", name, dto.getId(), fromNeighbour);
+                case CONNECT:
+                    fromNeighbour.setName(dto.getSenderName());
+                    sendResponseToNeighbour(MessageHeader.RESPONSE_TO_CONNECT, name, dto.getId(), fromNeighbour);
                     break;
-                case "responseToConnect":
+                case RESPONSE_TO_CONNECT:
                     fromNeighbour.setName(dto.getMessage());
                     break;
-                case "message":
-                    sendResponseToNeighbour("received", dto.getId().toString(), dto.getId(), fromNeighbour);                         // send confirmation of receiving message with particular id
+                case MESSAGE:
+                    sendResponseToNeighbour(MessageHeader.CONFIRM, dto.getId().toString(), dto.getId(), fromNeighbour);                         // send confirmation of receiving message with particular id
                     sendMessageForwarding(dto, fromNeighbour);
                     break;
-                case "received":
+                case CONFIRM:
                     UUID whichMessageConfirmed = UUID.nameUUIDFromBytes(dto.getMessage().getBytes());
                     fromNeighbour.addSuccessfulSent(whichMessageConfirmed);
                     break;
+                case NEW_DELEGATE:
+                    if(dto instanceof NewDelegateDTO) {
+                        fromNeighbour.setDelegate(((NewDelegateDTO) dto).getDelegate());
+                        sendResponseToNeighbour(MessageHeader.CONFIRM, name, dto.getId(), fromNeighbour);
+                    }
+                    break;
                 default:
                     System.out.println("unknown header received!");
+            }
+            if(delegate.getId().equals(UUID.nameUUIDFromBytes((recvSocket.getLocalAddress().toString() + this.port).getBytes())) || delegate == null) {
+                chooseDelegate();
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
-    private void sendResponseToNeighbour(String header, String data, UUID id, Neighbour neighbour) {
-        DTO dto = new DTO(header, data, name, Type.RESPONSE);
+    private void sendResponseToNeighbour(MessageHeader header, String data, UUID id, Neighbour neighbour) {
+        DTO dto = new DTO(header, data, name, MessageType.RESPONSE);
         dto.setId(id);
         new Thread(new Transmitter(dto, neighbour)).start();
     }
 
     private void sendConnectionRequest(String data, Neighbour neighbour) {
-        DTO dto = new DTO("connect", data, name, Type.REQUEST);
+        DTO dto = new DTO(MessageHeader.CONNECT, data, name, MessageType.REQUEST);
         new Thread(new Transmitter(dto, neighbour)).start();
     }
 
@@ -126,13 +135,25 @@ class ChatNode {
     }
 
     private void sendMessageToAll(String data) {
-        DTO dto = new DTO("message", data, name, Type.REQUEST);
+        DTO dto = new DTO(MessageHeader.MESSAGE, data, name, MessageType.REQUEST);
         for (Neighbour  receiver: neighbours.values()) {
             new Thread(new Transmitter(dto, receiver)).start();
         }
     }
 
+    private void sendMessageToAll(String data, Neighbour neighbour) {
+        DTO dto = new NewDelegateDTO(data, name, neighbour);
+        for (Neighbour  receiver: neighbours.values()) {
+            new Thread(new Transmitter(dto, receiver)).start();
+        }
+    }
 
+    private void chooseDelegate() {
+        if(neighbours.values().iterator().hasNext()) {
+            delegate = neighbours.values().iterator().next();
+        }
+        sendMessageToAll("", delegate);
+    }
 
     private class Transmitter implements Runnable {
 
@@ -166,9 +187,10 @@ class ChatNode {
                 do {
                     Long sendingTime = System.currentTimeMillis();
                     if(!packetLoss()) {
+                        System.out.println("sending");
                         recvSocket.send(packet);
                     }
-                    if(dto.getType().equals(Type.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
+                    if(dto.getMessageType().equals(MessageType.RESPONSE) || waitingResponse(sendingTime, dto.getId())) { //got resp
                         break;
                     } else if (System.currentTimeMillis() -  startWaitingTime > timeoutToDisconnect) {  // to much
                         disconnect = true;
@@ -187,7 +209,12 @@ class ChatNode {
 
         private void disconnectNeighbour(Neighbour neighbour) {
             neighbours.remove(neighbour.getId());
+            if(neighbour == delegate) {
+                delegate = null;
+                chooseDelegate();
+            }
             System.out.println("didn't receive responses for " + 1.0 * timeoutToDisconnect / 1000 + " seconds. (" + neighbour.getName()+ ": " + neighbour.getName() + " disconnected)");
+
         }
 
         private boolean waitingResponse(Long sendingTime, UUID id) {         // false if waiting too long
@@ -208,14 +235,14 @@ class ChatNode {
 
 
 
-    static class Neighbour {
+    static class Neighbour implements Serializable {
         private UUID id;
         private int port;
         private InetAddress ip;
         private String name;
-        Map<UUID, Integer> messageMonitors = new HashMap<>();// list of sent messages to that neighbour with their synchronization monitors
-        Set<UUID> successfulSentMessages = new HashSet<>();
-
+        private Map<UUID, Integer> messageMonitors = new HashMap<>();// list of sent messages to that neighbour with their synchronization monitors
+        private Set<UUID> successfulSentMessages = new HashSet<>();
+        private Neighbour delegate;
         Neighbour(InetAddress ip, int port) {
             this.ip = ip;
             this.port = port;
@@ -223,6 +250,13 @@ class ChatNode {
             id = UUID.nameUUIDFromBytes((this.ip.toString() + this.port).getBytes());
         }
 
+        Neighbour getDelegate() {
+            return delegate;
+        }
+
+        void setDelegate(Neighbour delegate) {
+            this.delegate = delegate;
+        }
 
         UUID getId() {
             return id;

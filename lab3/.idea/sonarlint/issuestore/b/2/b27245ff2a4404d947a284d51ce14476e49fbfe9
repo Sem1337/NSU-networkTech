@@ -1,0 +1,8 @@
+
+X
+java:S2274Ç":Remove this call to "wait" or move it into a "while" loop.(™¼¨Ë8·—òÑ.
+{	java:S135¦"YReduce the total number of break and continue statements in this loop to use at most one.(ü§è½ùÿÿÿÿ8·—òÑ.
+C
+java:S1860O"&Synchronize on a new "Object" instead.(¥Ïìú8·—òÑ.
+D
+java:S1860Ä"&Synchronize on a new "Object" instead.(¥Ïìú8·—òÑ.
