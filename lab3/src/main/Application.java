@@ -1,8 +1,13 @@
 package main;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException {
 
         if(args.length == 3) {
             new ChatNode(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2])).startCommunication();
