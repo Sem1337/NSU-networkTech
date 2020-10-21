@@ -12,7 +12,7 @@ public class ChatNode implements Serializable {
 
     private String name;
     private int packetLoss;
-    private static int timeoutToDisconnect = 10000;
+    private static int timeoutToDisconnect = 5000;
     private UUID id = UUID.randomUUID();
     private Map<UUID, Neighbour> neighbours = new HashMap<>();
     private DatagramSocket recvSocket;
@@ -80,7 +80,7 @@ public class ChatNode implements Serializable {
 
             new Thread(() -> {
                 synchronized (ReceivedMessages) {
-                    if (!ReceivedMessages.contains(dto.getId().toString() + dto.getSenderID().toString())) {
+                    if (!ReceivedMessages.contains(dto.getId().toString() + dto.getSenderID().toString()) || dto.getHeader().equals(MessageHeader.CONNECT)) {
                         System.out.println("[received] " + dto );
                         ReceivedMessages.add(dto.getId().toString() + dto.getSenderID().toString());
                         try {
@@ -103,10 +103,11 @@ public class ChatNode implements Serializable {
                 neighbours.put(dto.getSenderID(), sender);
             }
 
-            Integer monitor;
+            UUID monitor;
             switch (dto.getHeader()) {
                 case CONNECT:
                     sendResponse(MessageHeader.RESPONSE_TO_CONNECT, name, dto.getId(), sender);
+                    sendDelegateToOne(sender);
                     break;
                 case RESPONSE_TO_CONNECT:
                     monitor = targetToConnect.getMonitor(dto.getId());
@@ -169,9 +170,15 @@ public class ChatNode implements Serializable {
         UUID dtoID = UUID.randomUUID();
         for (Neighbour receiver : neighbours.values()) {
             DTO dto = new DTO(MessageHeader.MESSAGE, MessageType.REQUEST, name, this.id, data, receiver.getName());
+            //final Neighbour rec = receiver;
             dto.setId(dtoID);
             new Thread(new Transmitter(dto, receiver)).start();
         }
+    }
+
+    private void sendDelegateToOne(Neighbour receiver) {
+        DTO dto = new extendedDTO(MessageHeader.NEW_DELEGATE, name, this.id, delegate, "", receiver.getName());
+        new Thread(new Transmitter(dto, receiver)).start();
     }
 
     private void sendNotificationAboutNewDelegate(Neighbour neighbour) {
@@ -206,7 +213,7 @@ public class ChatNode implements Serializable {
         }
 
         private boolean packetLoss() {
-            return ThreadLocalRandom.current().nextInt(0, 101) < packetLoss;
+            return ThreadLocalRandom.current().nextInt(0, 100) < packetLoss;
         }
 
         private void sendMessageToNode(DTO dto, Neighbour receiver) {
@@ -220,7 +227,7 @@ public class ChatNode implements Serializable {
                 boolean disconnect = false;
                 long startWaitingTime = System.currentTimeMillis();
 
-                Integer monitor = receiver.getMonitor(dto.getId());
+                UUID monitor = receiver.getMonitor(dto.getId());
                 synchronized (monitor) {
                     do {
                         Long sendingTime = System.currentTimeMillis();
@@ -247,25 +254,28 @@ public class ChatNode implements Serializable {
         }
 
         private void disconnectNeighbour(Neighbour neighbour) {
-            neighbours.remove(neighbour.getId());
-            Neighbour newNeighbour = neighbour.getDelegate();
+            synchronized (neighbours) {
+                if(!neighbours.containsKey(neighbour.getId()))return;
+                neighbours.remove(neighbour.getId());
+                Neighbour newNeighbour = neighbour.getDelegate();
 
-            if (neighbour == delegate) {
-                delegate = null;
-                chooseDelegate();
-            }
+                if (neighbour == delegate) {
+                    delegate = null;
+                    chooseDelegate();
+                }
 
-            if (newNeighbour != null && !ChatNode.this.id.equals(newNeighbour.getId())) {
-                neighbours.put(newNeighbour.getId(), newNeighbour);
-                targetToConnect = newNeighbour;
-                sendConnectionRequest(id.toString());
+                if (newNeighbour != null && !ChatNode.this.id.equals(newNeighbour.getId())) {
+                    neighbours.put(newNeighbour.getId(), newNeighbour);
+                    targetToConnect = newNeighbour;
+                    sendConnectionRequest(id.toString());
+                }
             }
 
             System.out.println("didn't receive responses for " + 1.0 * timeoutToDisconnect / 1000 + " seconds. (" + neighbour.getName() + ": " + neighbour.getName() + " disconnected)");
         }
 
-        private boolean waitingResponse(Long sendingTime, Integer monitor) {
-            int timeout = 1500;
+        private boolean waitingResponse(Long sendingTime, UUID monitor) {
+            int timeout = 100;
             try {
                 monitor.wait(timeout);
             } catch (InterruptedException e) {
@@ -281,7 +291,7 @@ public class ChatNode implements Serializable {
         private int port;
         private InetAddress ip;
         private String name;
-        private transient Map<UUID, Integer> messageMonitors = new HashMap<>();// list of sent messages to that neighbour with their synchronization monitors
+        private transient Map<UUID, UUID> messageMonitors = new HashMap<>();// list of sent messages to that neighbour with their synchronization monitors
         private transient Set<UUID> successfulSentMessages = new HashSet<>();
         private transient Neighbour delegate;
 
@@ -332,14 +342,14 @@ public class ChatNode implements Serializable {
         }
 
         void addMessage(UUID id) {
-            messageMonitors.put(id, 1);
+            messageMonitors.put(id, UUID.randomUUID());
         }
 
         void removeMessage(UUID id) {
             messageMonitors.remove(id);
         }
 
-        Integer getMonitor(UUID id) {
+        UUID getMonitor(UUID id) {
             return messageMonitors.get(id);
         }
 
