@@ -5,5 +5,6 @@ public enum MessageHeader {
     RESPONSE_TO_CONNECT,
     NEW_DELEGATE,
     MESSAGE,
-    CONFIRM
+    CONFIRM,
+    PING
 }

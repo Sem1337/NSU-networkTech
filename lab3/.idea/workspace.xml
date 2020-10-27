@@ -7,12 +7,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f82ec7f-b8d7-4c01-9517-f39d6908b40b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/lab3_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/util/MessageUniqueRecord.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/util/PendingMessageRecord.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab3/main/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/Application.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$Neighbour.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$Neighbour.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$Transmitter.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$Transmitter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode$Transmitter.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/ChatNode.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/ChatNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ChatNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/MessageHeader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/MessageHeader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/dto/extendedDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/dto/extendedDTO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,8 +29,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -48,7 +55,7 @@
     <property name="android.sdk.path" value="$PROJECT_DIR$/../../../../androidSDK" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
@@ -59,7 +66,7 @@
       <recent name="main" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Application4">
+  <component name="RunManager" selected="Application.Application2">
     <configuration name="Application" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
@@ -77,7 +84,7 @@
     <configuration name="Application2" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Sem2 10 55552 192.168.0.103 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Sem2 10 55552 192.168.0.106 55551" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -141,6 +148,9 @@
       <workItem from="1602952482142" duration="10673000" />
       <workItem from="1603252979418" duration="4272000" />
       <workItem from="1603257388690" duration="52000" />
+      <workItem from="1603258472739" duration="6045000" />
+      <workItem from="1603724405828" duration="24111000" />
+      <workItem from="1603797162727" duration="8559000" />
     </task>
     <servers />
   </component>
@@ -165,10 +175,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="361" y="71" key="#Project_Structure/0.0.1536.824@0.0.1536.824" timestamp="1602529809945" />
-    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1603257411282">
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1603732118949">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1603257411282" />
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1603732118949" />
     <state x="499" y="192" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1602627724631">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -197,30 +207,30 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1602593902076" />
-    <state width="1493" height="271" key="GridCell.Tab.0.bottom" timestamp="1603257311063">
+    <state width="1493" height="264" key="GridCell.Tab.0.bottom" timestamp="1603750325509">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="271" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1603257311063" />
-    <state width="1493" height="271" key="GridCell.Tab.0.center" timestamp="1603257311063">
+    <state width="1493" height="264" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1603750325509" />
+    <state width="1493" height="264" key="GridCell.Tab.0.center" timestamp="1603750325509">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="271" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1603257311063" />
-    <state width="1493" height="271" key="GridCell.Tab.0.left" timestamp="1603257311063">
+    <state width="1493" height="264" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1603750325509" />
+    <state width="1493" height="264" key="GridCell.Tab.0.left" timestamp="1603750325509">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="271" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1603257311063" />
-    <state width="1493" height="271" key="GridCell.Tab.0.right" timestamp="1603257311063">
+    <state width="1493" height="264" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1603750325509" />
+    <state width="1493" height="264" key="GridCell.Tab.0.right" timestamp="1603750325509">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="271" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1603257311063" />
-    <state x="249" y="0" key="SettingsEditor" timestamp="1603253096031">
+    <state width="1493" height="264" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1603750325509" />
+    <state x="249" y="0" key="SettingsEditor" timestamp="1603725698865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="249" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1603253096031" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1603257388953">
+    <state x="249" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1603725698865" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1603797186289">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1603257388953" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1603797186289" />
     <state x="542" y="40" key="refactoring.ChangeSignatureDialog" timestamp="1602612799503">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

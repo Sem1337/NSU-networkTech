@@ -3,7 +3,6 @@ package main.dto;
 import main.ChatNode;
 import main.MessageHeader;
 import main.MessageType;
-import main.dto.DTO;
 
 import java.io.Serializable;
 import java.util.UUID;
