@@ -130,7 +130,7 @@ public class ChatNode implements Serializable {
                     Long firstTimeStamp = mes.getValue().getFirstTimeStamp();
                     if (currTime - firstTimeStamp > timeoutToDisconnect) {
                         synchronized (neighbours) {
-                            if(neighbours.containsKey(mes.getKey().getReceiverID())) {
+                            if(mes.getKey().getReceiverID() != null && neighbours.containsKey(mes.getKey().getReceiverID())) {
                                 disconnectNeighbour(neighbours.get(mes.getKey().getReceiverID()));
                             }
                         }
