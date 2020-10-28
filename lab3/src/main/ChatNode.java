@@ -20,7 +20,7 @@ public class ChatNode implements Serializable {
 
     private String name;
     private int packetLoss;
-    private static int timeoutToDisconnect = 30000;
+    private static int timeoutToDisconnect = 10000;
     private UUID id = UUID.randomUUID();
     private final Map<UUID, Neighbour> neighbours = new ConcurrentHashMap<>();
     private DatagramSocket recvSocket;
