@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ChatNode implements Serializable {
+public class ChatNode {
 
     private String name;
     private int packetLoss;
@@ -75,9 +75,7 @@ public class ChatNode implements Serializable {
                     Thread.currentThread().interrupt();
                 }
             }
-            neighbours.forEach((key, neighbour) -> {
-                putMessageToPendingResponses(new DTO(MessageHeader.PING, MessageType.RESPONSE, name, id, "", neighbour.getName()), neighbour);
-            });
+            neighbours.forEach((key, neighbour) -> putMessageToPendingResponses(new DTO(MessageHeader.PING, MessageType.RESPONSE, name, id, "", neighbour.getName()), neighbour));
         }
     }
 
@@ -239,7 +237,6 @@ public class ChatNode implements Serializable {
                 default:
                     System.out.println("unknown header received!");
             }
-            //receivedMessages.add(new MessageUniqueRecord(dto.getId(), sender.getId()));
             if (delegate == null || delegate.getId() == this.id) {
                 chooseDelegate();
             }
@@ -443,7 +440,7 @@ public class ChatNode implements Serializable {
                         try {
                             this.wait(timeoutToDisconnect);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
                         }
                         successfulSentMessages.entrySet().removeIf(e-> System.currentTimeMillis() - e.getValue().getFirstTimeStamp() > timeoutToDisconnect);
                     }
