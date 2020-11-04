@@ -7,10 +7,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f82ec7f-b8d7-4c01-9517-f39d6908b40b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/d/adf2e68636d23df742511fcb6dbc513d9617bd16" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/d/adf2e68636d23df742511fcb6dbc513d9617bd16" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b27245ff2a4404d947a284d51ce14476e49fbfe9" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b27245ff2a4404d947a284d51ce14476e49fbfe9" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/c/1/c1bda5ddc5523dd107eaa9e78be798c91be5219f" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/lab3/main/ChatNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/lab3/main/ChatNode.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/ChatNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ChatNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -44,7 +49,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="android.sdk.path" value="$PROJECT_DIR$/../../../../androidSDK" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../herokuTest/java-getting-started" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -55,6 +60,18 @@
       <recent name="main.dto" />
       <recent name="main" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager" selected="Application.Application7">
     <configuration name="Application" type="Application" factoryName="Application" nameIsGenerated="true">
@@ -74,7 +91,7 @@
     <configuration name="Application2" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node2 60 55552 192.168.0.106 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node2 60 55552 192.168.0.103 55551" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -88,7 +105,7 @@
     <configuration name="Application3" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node3 60 55553 192.168.0.106 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node3 60 55553 192.168.0.103 55551" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -102,7 +119,7 @@
     <configuration name="Application4" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node4 60 55554 192.168.0.106 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node4 60 55554 192.168.0.103 55551" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -116,7 +133,7 @@
     <configuration name="Application5" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node5 60 55555 192.168.0.106 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node5 60 55555 192.168.0.103 55551" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -130,7 +147,7 @@
     <configuration name="Application6" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node6 60 55556 192.168.0.106 55555" />
+      <option name="PROGRAM_PARAMETERS" value="Node6 60 55556 192.168.0.103 55555" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -144,7 +161,7 @@
     <configuration name="Application7" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node7 60 55557 192.168.0.106 55555" />
+      <option name="PROGRAM_PARAMETERS" value="Node7 60 55557 192.168.0.103 55555" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -186,6 +203,8 @@
       <workItem from="1603258472739" duration="6045000" />
       <workItem from="1603724405828" duration="24111000" />
       <workItem from="1603797162727" duration="9906000" />
+      <workItem from="1603860758921" duration="3738000" />
+      <workItem from="1604351092970" duration="21000" />
     </task>
     <servers />
   </component>
