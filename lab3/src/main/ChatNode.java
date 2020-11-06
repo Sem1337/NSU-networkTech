@@ -133,7 +133,7 @@ public class ChatNode {
                             }
                         }
                     } else if (currTime - lastTimeStamp > timeout || lastTimeStamp.equals(firstTimeStamp)) {
-                        sendMessageToNode(mes.getKey(), packet);
+                        sendMessageToNode(packet);
                         mes.getValue().setLastTimeStamp(currTime);
                     }
                 }
@@ -205,6 +205,7 @@ public class ChatNode {
                 case CONNECT:
                     sender.setName(dto.getSenderName());
                     sender.setId(dto.getSenderID());
+                    sender.setDelegate(((extendedDTO)dto).getDelegate());
                     neighbours.put(sender.getId(), sender);
                     sendResponse(MessageHeader.RESPONSE_TO_CONNECT, name, dto.getId(), sender);
                     if(delegate!=null) {
@@ -341,13 +342,6 @@ public class ChatNode {
         }
     }
 
-    private synchronized void sendMessageToNode(MessageUniqueRecord record, DatagramPacket packet) {
-        try {
-            recvSocket.send(packet);
-        } catch (IOException e) {
-            System.out.println(e.getLocalizedMessage());
-        }
-    }
 
     private synchronized void disconnectNeighbour(Neighbour neighbour) {
         if (neighbour==null || !neighbours.containsKey(neighbour.getId())) return;
@@ -374,7 +368,7 @@ public class ChatNode {
         private String name;
         private transient long lastPingTime;
         private transient Map<MessageUniqueRecord, PendingMessageRecord> successfulSentMessages = new HashMap<>();
-        private transient Neighbour delegate;
+        private Neighbour delegate;
 
         Neighbour(InetAddress ip, int port) {
             this.ip = ip;
