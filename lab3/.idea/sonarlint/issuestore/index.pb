@@ -9,3 +9,7 @@ K
 src/main/MessageHeader.java,5\b\5b9a3a50f699e96bd109972a9dc2e10cf45cc468
 V
 &src/main/util/MessageUniqueRecord.java,c\5\c54d9f4cf68057d514f450788cf9371c5a308343
+M
+src/main/dto/extendedDTO.java,4\3\436dabb645ad8dbe988ac6153c55f98f365e14f2
+W
+'src/main/util/PendingMessageRecord.java,4\c\4cb53c4f5fcdd83710a97f39c1b2b7e2e4ada851

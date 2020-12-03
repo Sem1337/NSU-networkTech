@@ -1,0 +1,23 @@
+
+{	java:S135´"YReduce the total number of break and continue statements in this loop to use at most one.(¾ùÌ¾ıÿÿÿÿ8ÜëÓâ.
+X
+java:S1141³"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ÜëÓâ.
+^	java:S125¦"<This block of commented-out lines of code should be removed.(õ—áÆùÿÿÿÿ8ÜëÓâ.
+Y	java:S107ä"<Method has 8 parameters, which is greater than 7 authorized.(ÃÒ¼¿8ÜëÓâ.
+^	java:S125Õ"<This block of commented-out lines of code should be removed.(ù»†øÿÿÿÿ8ÜëÓâ.
+s
+java:S2236¢"PRefactor the synchronisation mechanism to not use a Thread instance as a monitor(‡†„‹ıÿÿÿÿ8ÜëÓâ.
+Y	java:S125·"<This block of commented-out lines of code should be removed.(à–ŞÇ8ÜëÓâ.
+^	java:S125À"<This block of commented-out lines of code should be removed.(‘ì–™şÿÿÿÿ8ÜëÓâ.
+Y	java:S125ú"<This block of commented-out lines of code should be removed.(½Æ’é8ÜëÓâ.
+^	java:S125È"<This block of commented-out lines of code should be removed.(éØ»Úûÿÿÿÿ8ÜëÓâ.
+Y	java:S125•"<This block of commented-out lines of code should be removed.(€À•É8ÜëÓâ.
+Y	java:S125ô"<This block of commented-out lines of code should be removed.(ø÷«•8ÜëÓâ.
+^	java:S125û"<This block of commented-out lines of code should be removed.(±‡ìÆÿÿÿÿÿ8ÜëÓâ.
+^	java:S125è"<This block of commented-out lines of code should be removed.(Èñ×½úÿÿÿÿ8ÜëÓâ.
+Y	java:S125˜"<This block of commented-out lines of code should be removed.(‘ªŒ8ÜëÓâ.
+m
+java:S2236>"PRefactor the synchronisation mechanism to not use a Thread instance as a monitor(ã­Ó 8Ô‡¼‹â.
+Y	java:S125¡"<This block of commented-out lines of code should be removed.(†Áß¬8ÜëÓâ.
+Y	java:S125ï"<This block of commented-out lines of code should be removed.(ò–†™8ÜëÓâ.
+Y	java:S125‘"<This block of commented-out lines of code should be removed.(•Šºá8ÜëÓâ.

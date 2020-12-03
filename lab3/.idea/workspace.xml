@@ -7,8 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f82ec7f-b8d7-4c01-9517-f39d6908b40b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b27245ff2a4404d947a284d51ce14476e49fbfe9" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/b/2/b27245ff2a4404d947a284d51ce14476e49fbfe9" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/ChatNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ChatNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/lab3_jar/lab3.jar" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +46,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="android.sdk.path" value="$PROJECT_DIR$/../../../../androidSDK" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../ooad/mates" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -68,7 +70,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Application">
+  <component name="RunManager" selected="Application.Application5">
     <configuration name="Application" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
@@ -114,7 +116,7 @@
     <configuration name="Application4" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node4 60 55554 192.168.0.103 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node4 60 55554 192.168.0.103 55553" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -128,7 +130,7 @@
     <configuration name="Application5" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="main.Application" />
       <module name="lab3" />
-      <option name="PROGRAM_PARAMETERS" value="Node5 60 55555 192.168.0.103 55551" />
+      <option name="PROGRAM_PARAMETERS" value="Node5 60 55555 192.168.0.103 55553" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="main.dto.*" />
@@ -200,7 +202,10 @@
       <workItem from="1603797162727" duration="9906000" />
       <workItem from="1603860758921" duration="3738000" />
       <workItem from="1604351092970" duration="21000" />
-      <workItem from="1604652741147" duration="3627000" />
+      <workItem from="1604652741147" duration="4069000" />
+      <workItem from="1604992197593" duration="57000" />
+      <workItem from="1605071690227" duration="2992000" />
+      <workItem from="1605097876078" duration="41000" />
     </task>
     <servers />
   </component>
