@@ -56,7 +56,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>Main</mainClass>
+                                    <mainClass>snakes.Start</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -67,12 +67,27 @@
                 </executions>
             </plugin>
 
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>snakes.Start</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>Main</mainClass>
+                    <mainClass>snakes.Start</mainClass>
                 </configuration>
             </plugin>
         </plugins>

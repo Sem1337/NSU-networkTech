@@ -59,6 +59,7 @@ public class GameSceneController extends ScreenController {
 
     private void drawField() {
         try {
+            Platform.runLater(this::drawConfig);
             while (!Thread.currentThread().isInterrupted()) {
                 Platform.runLater(this::drawBackGround);
                 Platform.runLater(this::drawSnakes);
@@ -71,6 +72,11 @@ public class GameSceneController extends ScreenController {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void drawConfig() {
+        Label configLabel = new Label(getNode().getGameState().getConfig().toString());
+        infoList.getChildren().add(configLabel);
     }
 
     private void updateScoreBoard() {

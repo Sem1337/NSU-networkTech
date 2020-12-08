@@ -21,5 +21,9 @@ N
 -src/main/java/snakes/GameSetupController.java,4\e\4e04cedfa19f8430aff8757777315dacd77cc49f
 X
 (src/main/java/snakes/PacketUniqueID.java,c\3\c32fa2f7ca43c8818427ebc1321aecb4e70406c7
-Q
-!src/main/java/snakes/NewMain.java,a\8\a83fc8789e15820c13a3d5362689df2c23561ecd
+J
+dependency-reduced-pom.xml,8\a\8a88dfd5af6f2db5a5431581b56e901f5f143d92
+R
+"src/main/java/META-INF/MANIFEST.MF,6\3\63ef5783cbf71fdf39c1fd6ae6873fd812259930
+O
+src/main/java/snakes/Start.java,7\0\70ff6ae9ed5ce852df9453adb62674efbe33009d

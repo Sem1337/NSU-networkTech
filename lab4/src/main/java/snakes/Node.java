@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import snakes.proto.SnakesProto;
 
+import javax.management.relation.Role;
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -35,8 +33,15 @@ public class Node extends Thread {
         pendingHandler.setName("PENDING HANDLER");
         unicastListener = new Thread(this::listenUnicast);
         unicastListener.setName("UNICASTLISTENER");
-        pingSender = new Thread(this::sendPings);
+        pingSender = new Thread(this::keepAlive);
         pingSender.setName("PINGSENDER");
+    }
+
+
+    private synchronized void removePLayers() {
+        //System.out.println("REMOVING " + playersToRemove.size() + " PLAYERS");
+        playersToRemove.forEach(p -> players.remove(p.getId()));
+        playersToRemove.clear();
     }
 
 
@@ -45,25 +50,28 @@ public class Node extends Thread {
         System.out.println("running...");
         announceListener.start();
         messageCleaner.start();
+        final Object obj = new Object();
         while (!Thread.currentThread().isInterrupted()) {
-            synchronized (this) {
+            synchronized (obj) {
                 try {
                     if (role.equals(SnakesProto.NodeRole.MASTER)) {
                         proceedGameState();
                         SnakesProto.GameMessage gameMessage = constructGameStateMessage();
-                        System.out.println("my id = " + idInGame);
-                        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+                        for (SnakesProto.GamePlayer player : players.values()) {
                             //DatagramPacket packet = constructPacket()
-                            System.out.println(player.getId());
                             if (player.getId() == idInGame) continue;
                             sendGameState(gameMessage, player);
                         }
+
+                        removePLayers();
+
                     }
-                    this.wait(gameState.getConfig().getStateDelayMs());
+                    obj.wait(gameState.getConfig().getStateDelayMs());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+
         }
     }
 
@@ -104,7 +112,7 @@ public class Node extends Thread {
 
 
     private SnakesProto.GamePlayer getDeputy() {
-        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+        for (SnakesProto.GamePlayer player : players.values()) {
             if (player.getRole().equals(SnakesProto.NodeRole.DEPUTY)) {
                 return player;
             }
@@ -116,7 +124,14 @@ public class Node extends Thread {
         SnakesProto.GamePlayer deputy = getDeputy();
         if (deputy == null) return;
         masterId = deputy.getId();
-        changeRole(deputy, SnakesProto.NodeRole.MASTER);
+        masterPort = deputy.getPort();
+        try {
+            masterAddr = InetAddress.getByName(deputy.getIpAddress());
+        } catch (UnknownHostException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+        players.put(deputy.getId(), changeRole(deputy, SnakesProto.NodeRole.MASTER));
+        System.out.println("notifying deputy from " + role + " with id = " + idInGame);
         sendRoleChange(deputy, role, SnakesProto.NodeRole.MASTER);
     }
 
@@ -133,24 +148,12 @@ public class Node extends Thread {
     }
 
     private SnakesProto.GameState.Snake killSnake(SnakesProto.GameState.Snake snake) {
-        if (snake.getPlayerId() != idInGame) {
-            int it = 0;
-            for (SnakesProto.GamePlayer player : newPlayers) {
-                if (player.getId() == snake.getPlayerId()) {
-                    newPlayers.set(it, changeRole(player, SnakesProto.NodeRole.VIEWER));
-                }
-                it++;
-            }
-            sendRoleChange(getPlayerById(snake.getPlayerId()), role, SnakesProto.NodeRole.VIEWER);
-        } else {
-            masterId = -1;
-            role = SnakesProto.NodeRole.VIEWER;
-            changeRole(getPlayerById(idInGame), SnakesProto.NodeRole.VIEWER);
-            notifyDeputy();
-        }
+        SnakesProto.GamePlayer player = players.get(snake.getPlayerId());
+        deadPlayers.put(player.getId(), player);
+        System.out.println("kill snake " + player.getId());
         return SnakesProto.GameState.Snake.newBuilder()
                 .setState(SnakesProto.GameState.Snake.SnakeState.ZOMBIE)
-                .setPlayerId(snake.getPlayerId())
+                .setPlayerId(-2)
                 .addAllPoints(snake.getPointsList())
                 .setHeadDirection(snake.getHeadDirection())
                 .build();
@@ -158,53 +161,66 @@ public class Node extends Thread {
 
     private void checkSnakesIntersections() {
         int it = 0;
-        for (SnakesProto.GameState.Snake snake : newSnakes) {
-            if (snake.getState().equals(SnakesProto.GameState.Snake.SnakeState.ZOMBIE))continue;
-            if (isIntersectWithSnake(snake.getPlayerId(), snake.getPoints(0), newSnakes)) {
-                newSnakes.set(it, killSnake(snake));
+        Map<Integer, SnakesProto.GameState.Snake> deadSnakes = new HashMap<>();
+        for (SnakesProto.GameState.Snake snake : snakes) {
+            if (snake.getState().equals(SnakesProto.GameState.Snake.SnakeState.ZOMBIE)) {
+                it++;
+                continue;
+            }
+            if (isIntersectWithSnake(snake.getPlayerId(), snake.getPoints(0), snakes)) {
+                deadSnakes.put(it, snake);
             }
             it++;
         }
+        deadSnakes.forEach((k, v) -> snakes.set(k, killSnake(v)));
     }
 
     private void setDeputy() {
-        int it = 0;
-        for(SnakesProto.GamePlayer player : newPlayers) {
+        for (SnakesProto.GamePlayer player : players.values()) {
             if (player.getRole().equals(SnakesProto.NodeRole.NORMAL)) {
                 SnakesProto.GamePlayer newPlayer = changeRole(player, SnakesProto.NodeRole.DEPUTY);
-                newPlayers.set(it, newPlayer);
+                players.put(newPlayer.getId(), newPlayer);
                 sendRoleChange(newPlayer, role, SnakesProto.NodeRole.DEPUTY);
             }
-            it++;
         }
     }
 
-    private void proceedGameState() {
-        newPlayers.addAll(gameState.getPlayers().getPlayersList());
-        synchronized (playersToRemove) {
-            newPlayers.removeAll(playersToRemove);
-            playersToRemove.clear();
-        }
+    private synchronized void proceedGameState() {
         SnakesProto.GameConfig config = gameState.getConfig();
-        List<SnakesProto.GameState.Snake> snakes = nextSnakesState();
-        newSnakes.addAll(snakes);
+
+        snakes = nextSnakesState();
+
+
+
         checkSnakesIntersections();
-        if (!isDeputySet()) {
-            setDeputy();
+
+
+        deadPlayers.forEach((k, v) -> {
+            players.put(v.getId(), changeRole(v, SnakesProto.NodeRole.VIEWER));
+            sendRoleChange(v, SnakesProto.NodeRole.MASTER, SnakesProto.NodeRole.VIEWER);
+        });
+
+        if (role.equals(SnakesProto.NodeRole.VIEWER)) {
+            SnakesProto.GamePlayer deputy = getDeputy();
+            if (deputy == null) setDeputy();
+            notifyDeputy();
         }
-        List<SnakesProto.GameState.Coord> newFood = placeFood(newSnakes);
+
+
+        deadPlayers.clear();
+        placeFood(snakes);
         stateOrder++;
         gameState = SnakesProto.GameState.newBuilder()
                 .setPlayers(SnakesProto.GamePlayers.newBuilder()
-                        .addAllPlayers(newPlayers)
+                        .addAllPlayers(players.values())
                         .build())
                 .setConfig(config)
-                .addAllSnakes(newSnakes)
-                .addAllFoods(newFood)
+                .addAllSnakes(snakes)
+                .addAllFoods(food)
                 .setStateOrder(stateOrder)
                 .build();
-        newPlayers.clear();
-        newSnakes.clear();
+
+
     }
 
 
@@ -221,23 +237,20 @@ public class Node extends Thread {
         return result;
     }
 
-    private List<SnakesProto.GameState.Coord> placeFood(List<SnakesProto.GameState.Snake> snakes) {
+    private void placeFood(List<SnakesProto.GameState.Snake> snakes) {
         int required = gameState.getConfig().getFoodStatic() + (int) (gameState.getPlayers().getPlayersCount() * gameState.getConfig().getFoodPerPlayer());
-        List<SnakesProto.GameState.Coord> newFood = new LinkedList<>(gameState.getFoodsList());
-        newFood.removeAll(removedFood);
+
+        food.removeAll(removedFood);
         removedFood.clear();
-        int current = newFood.size();
+        int current = food.size();
         for (SnakesProto.GameState.Coord cell : freeCells(snakes)) {
             if (current >= required) break;
-            newFood.add(cell);
+            food.add(cell);
             current++;
         }
-        return newFood;
     }
 
     private SnakesProto.GameState.Coord coord(int x, int y) {
-        //x = (x + gameState.getConfig().getWidth()) % gameState.getConfig().getWidth();
-        //y = (y + gameState.getConfig().getHeight()) % gameState.getConfig().getHeight();
         return SnakesProto.GameState.Coord.newBuilder()
                 .setX(x)
                 .setY(y)
@@ -249,25 +262,27 @@ public class Node extends Thread {
     }
 
     private int getMasterId() {
-        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
-
+        for (SnakesProto.GamePlayer player : players.values()) {
             if (player.getRole().equals(SnakesProto.NodeRole.MASTER)) {
                 return player.getId();
             }
-
         }
         return -1;
     }
 
-    private SnakesProto.GamePlayer getPlayerById(int id) {
+    private boolean idExists(int id) {
         for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
-            if (player.getId() == id) return player;
+            if (player.getId() == id) return true;
         }
-        return SnakesProto.GamePlayer.getDefaultInstance();
+        return false;
+    }
+
+    private SnakesProto.GamePlayer getPlayerById(int id) {
+        return players.get(id);
     }
 
     private int getPlayerIdByAddress(InetAddress ip, int port) {
-        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+        for (SnakesProto.GamePlayer player : players.values()) {
             String strIp = ip.toString().substring(1);
             if (player.getPort() == port && player.getIpAddress().equals(strIp)) {
                 return player.getId();
@@ -334,8 +349,8 @@ public class Node extends Thread {
     }
 
     private boolean isIntersectWithFood(SnakesProto.GameState.Coord cell) {
-        for (SnakesProto.GameState.Coord food : gameState.getFoodsList()) {
-            if (food.equals(cell)) return true;
+        for (SnakesProto.GameState.Coord fd : food) {
+            if (fd.equals(cell)) return true;
         }
         return false;
     }
@@ -361,9 +376,11 @@ public class Node extends Thread {
         SnakesProto.GameState.Coord head = snake.getPoints(0);
         SnakesProto.GameState.Coord prevHead = snake.getPoints(1);
         SnakesProto.Direction direction = directionMap.get(snake.getPlayerId());
-
         SnakesProto.Direction prevDirection = getDirection(prevHead);
         SnakesProto.GameState.Coord tail = snake.getPoints(pointsCount - 1);
+        if (snake.getPlayerId() == -2) {
+            direction = snake.getHeadDirection();
+        }
         head = fixPoint(movePoint(head, direction));
         List<SnakesProto.GameState.Coord> newPoints = new LinkedList<>();
         newPoints.add(head);
@@ -396,12 +413,9 @@ public class Node extends Thread {
             }
             int it = 0;
             removedFood.add(head);
-            for (SnakesProto.GamePlayer player : newPlayers) {
-                if (player.getId() == snake.getPlayerId()) {
-                    newPlayers.set(it, addPoint(player));
-                    break;
-                }
-                it++;
+            SnakesProto.GamePlayer player = players.get(snake.getPlayerId());
+            if (player != null) {
+                players.put(snake.getPlayerId(), addPoint(player));
             }
         }
 
@@ -420,23 +434,26 @@ public class Node extends Thread {
         }
 
         SnakesProto.GameState.Snake.SnakeState state = snake.getState();
-        if (playersToRemove.contains(getPlayerById(snake.getPlayerId())))
+        int id = snake.getPlayerId();
+        if (playersToRemove.contains(getPlayerById(snake.getPlayerId()))) {
             state = SnakesProto.GameState.Snake.SnakeState.ZOMBIE;
+            id = -2;
+        }
         return SnakesProto.GameState.Snake.newBuilder()
                 .setState(state)
                 .setHeadDirection(direction)
-                .setPlayerId(snake.getPlayerId())
+                .setPlayerId(id)
                 .addAllPoints(newPoints)
                 .build();
 
     }
 
     private List<SnakesProto.GameState.Snake> nextSnakesState() {
-        List<SnakesProto.GameState.Snake> snakes = new LinkedList<>();
-        for (SnakesProto.GameState.Snake snake : gameState.getSnakesList()) {
-            snakes.add(nextSnakeState(snake));
+        List<SnakesProto.GameState.Snake> newSnakes = new LinkedList<>();
+        for (SnakesProto.GameState.Snake snake : snakes) {
+            newSnakes.add(nextSnakeState(snake));
         }
-        return snakes;
+        return newSnakes;
     }
 
     private List<SnakesProto.GameState.Coord> findSnakeSpawn(int playerId) {
@@ -500,30 +517,29 @@ public class Node extends Thread {
 
 
     private SnakesProto.GameState.Snake getSnake(int playerId) {
-        for (SnakesProto.GameState.Snake snake : gameState.getSnakesList()) {
+        for (SnakesProto.GameState.Snake snake : snakes) {
             if (snake.getPlayerId() == playerId) {
                 return snake;
             }
         }
-        return SnakesProto.GameState.Snake.getDefaultInstance();
+        return null;
     }
 
     private void changeSnakeDirection(int playerId, SnakesProto.Direction direction) {
         SnakesProto.GameState.Snake snake = getSnake(playerId);
+        if (snake == null) return;
         if (snake.getState().equals(SnakesProto.GameState.Snake.SnakeState.ZOMBIE)) return;
-        System.out.println("trying...");
         if (!direction.equals(invertDirection(snake.getHeadDirection()))) {
-            System.out.println("Changed!!");
             directionMap.put(playerId, direction);
         }
     }
 
-    void changeDirection(SnakesProto.Direction direction) {
+    synchronized void changeDirection(SnakesProto.Direction direction) {
         if (role.equals(SnakesProto.NodeRole.MASTER)) {
-            System.out.println("changing dir to " + direction);
             changeSnakeDirection(idInGame, direction);
             return;
         }
+        if (masterId == idInGame) return;
         long sendTime = System.currentTimeMillis();
         SnakesProto.GameMessage message = constructSteer(direction);
         DatagramPacket packet = constructPacket(message, masterAddr, masterPort);
@@ -558,6 +574,9 @@ public class Node extends Thread {
 
     private SnakesProto.GameMessage constructAck(SnakesProto.GameMessage message, int receiverId) {
         long seq = message.getMsgSeq();
+        //System.out.println("answering to " + message.getTypeCase());
+        //System.out.println("idInGame = " + idInGame);
+        //System.out.println("to = " + receiverId);
         return SnakesProto.GameMessage
                 .newBuilder()
                 .setMsgSeq(seq)
@@ -587,7 +606,7 @@ public class Node extends Thread {
                             knownGames.remove(sender);
                         }
                     }
-                    knownGames.wait(500);
+                    knownGames.wait(900);
                 }
             }
         } catch (InterruptedException e) {
@@ -664,52 +683,54 @@ public class Node extends Thread {
                 .setPing(pingMsg)
                 .setMsgSeq(msgSeq++)
                 .build();
+        //System.out.println("ip = " + ip + " port = " + port);
         DatagramPacket packet = constructPacket(message, ip, port);
-        synchronized (pendingMessages) {
-            long sendTime = System.currentTimeMillis();
-            pendingMessages.put(message.getMsgSeq(), new PacketUniqueID(sendTime, sendTime, packet, receiverId));
-            try {
-                unicastSocket.send(packet);
-            } catch (IOException e) {
-                System.out.println(e.getLocalizedMessage());
+
+        long sendTime = System.currentTimeMillis();
+        //System.out.println("putt + " + packet.getSocketAddress());
+        pendingMessages.put(message.getMsgSeq(), new PacketUniqueID(sendTime, sendTime, packet, receiverId));
+        try {
+            unicastSocket.send(packet);
+        } catch (IOException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+
+    }
+
+    private synchronized void sendPings() {
+        try {
+            if (role.equals(SnakesProto.NodeRole.MASTER)) {
+                for (SnakesProto.GamePlayer player : players.values()) {
+                    if (player.getId() == idInGame || lastSentMessage.get(player.getId()) == null) continue;
+                    long curTime = System.currentTimeMillis();
+                    if (curTime - lastSentMessage.get(player.getId()) > gameState.getConfig().getPingDelayMs()) {
+                        lastSentMessage.put(player.getId(), curTime);
+                        sendPing(InetAddress.getByName(player.getIpAddress()), player.getPort(), player.getId());
+                    }
+                }
+
+            } else if (masterId != -1) {
+                long curTime = System.currentTimeMillis();
+                if (lastSentMessage.get(masterId) == null) return;
+                if (curTime - lastSentMessage.get(masterId) > gameState.getConfig().getPingDelayMs()) {
+                    lastSentMessage.put(masterId, curTime);
+                    sendPing(masterAddr, masterPort, masterId);
+                }
             }
+        } catch (UnknownHostException e) {
+            System.out.println(e.getLocalizedMessage());
         }
     }
 
-    private void sendPings() {
+    private void keepAlive() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 synchronized (sync) {
-                    if (inGame) {
-                        if (role.equals(SnakesProto.NodeRole.MASTER)) {
-                            try {
-                                for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
-                                    if (player.getId() == idInGame) continue;
-                                    long curTime = System.currentTimeMillis();
-                                    /*System.out.println(player.getId());
-                                    System.out.println(idInGame);
-                                    System.out.println("----");*/
-                                    if (lastSentMessage.get(player.getId()) == null) continue;
-                                    if (curTime - lastSentMessage.get(player.getId()) > gameState.getConfig().getPingDelayMs()) {
-                                        lastSentMessage.put(player.getId(), curTime);
-                                        sendPing(InetAddress.getByName(player.getIpAddress()), player.getPort(), player.getId());
-                                    }
-                                }
-                            } catch (UnknownHostException e) {
-                                System.out.println("cant ping" + e.getLocalizedMessage());
-                            }
-                        } else if (masterId != -1) {
-                            long curTime = System.currentTimeMillis();
-                            if (lastSentMessage.get(masterId) == null) continue;
-                            if (curTime - lastSentMessage.get(masterId) > gameState.getConfig().getPingDelayMs()) {
-                                lastSentMessage.put(masterId, curTime);
-                                sendPing(masterAddr, masterPort, masterId);
-                            }
-                        }
-                    }
+                    if (inGame) sendPings();
+                    sync.wait(gameState.getConfig().getPingDelayMs());
                 }
-            } catch (NullPointerException e) {
-                System.out.println("sendPings " + e.getLocalizedMessage());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -735,7 +756,6 @@ public class Node extends Thread {
             long sendTime = System.currentTimeMillis();
 
             DatagramPacket packet = constructPacket(message, ip, port);
-            //System.out.println("added error " + message.getMsgSeq());
             pendingMessages.put(message.getMsgSeq(), new PacketUniqueID(sendTime, sendTime, packet, -1));
             unicastSocket.send(packet);
         } catch (IOException e) {
@@ -744,16 +764,12 @@ public class Node extends Thread {
     }
 
     private void sendGameState(SnakesProto.GameMessage message, SnakesProto.GamePlayer player) {
-        System.out.println("sending game state");
         try {
             long sendTime = System.currentTimeMillis();
-            //System.out.println("ip addr to send = " + player.getIpAddress());
-            //System.out.println("sending game state " + message.getMsgSeq());
-
             InetAddress ip = InetAddress.getByName(player.getIpAddress());
             int port = player.getPort();
             DatagramPacket packet = constructPacket(message, ip, port);
-            //System.out.println("added game state " + message.getMsgSeq());
+            //System.out.println("sending state to " + ip + " " + port + "  ( " + player.getIpAddress() + " )");
             lastSentMessage.put(player.getId(), sendTime);
             pendingMessages.put(message.getMsgSeq(), new PacketUniqueID(sendTime, sendTime, packet, player.getId()));
             unicastSocket.send(packet);
@@ -763,13 +779,22 @@ public class Node extends Thread {
     }
 
     private void sendRoleChange(SnakesProto.GamePlayer receiver, SnakesProto.NodeRole senderRole, SnakesProto.NodeRole receiverRole) {
-        System.out.println("sending ROle change");
+        players.put(receiver.getId(), changeRole(receiver, receiverRole));
+        players.put(idInGame, changeRole(getPlayerById(idInGame),senderRole));
+        if (receiver.getId() == idInGame) {
+            role = receiverRole;
+            return;
+        }
+        System.out.println("sending role change: from " + senderRole + " to " + receiverRole);
+        System.out.println("role change from =  " + idInGame + "  to  =  " + receiver.getId());
         SnakesProto.GameMessage.RoleChangeMsg roleChangeMsg = SnakesProto.GameMessage.RoleChangeMsg.newBuilder()
                 .setReceiverRole(receiverRole)
                 .setSenderRole(senderRole)
                 .build();
         SnakesProto.GameMessage message = SnakesProto.GameMessage.newBuilder()
                 .setRoleChange(roleChangeMsg)
+                .setReceiverId(receiver.getId())
+                .setSenderId(idInGame)
                 .setMsgSeq(msgSeq++)
                 .build();
 
@@ -785,7 +810,8 @@ public class Node extends Thread {
     }
 
     private void setNewMaster() {
-        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+        for (SnakesProto.GamePlayer player : players.values()) {
+            System.out.println(player.getRole() + "  " + player.getId());
             if (player.getRole().equals(SnakesProto.NodeRole.DEPUTY)) {
                 masterId = player.getId();
                 masterPort = player.getPort();
@@ -794,52 +820,67 @@ public class Node extends Thread {
                 } catch (UnknownHostException e) {
                     System.out.println(e.getLocalizedMessage());
                 }
+                players.put(masterId, changeRole(player, SnakesProto.NodeRole.MASTER));
                 if (masterId == idInGame) {
-                    for (SnakesProto.GamePlayer receiver : gameState.getPlayers().getPlayersList()) {
+                    role = SnakesProto.NodeRole.MASTER;
+                    System.out.println("I Am Master Now #####");
+                    for (SnakesProto.GamePlayer receiver : players.values()) {
                         if (receiver.getId() == idInGame || receiver.getRole().equals(SnakesProto.NodeRole.MASTER))
                             continue;
                         sendRoleChange(receiver, SnakesProto.NodeRole.MASTER, receiver.getRole());
                     }
+                    setDeputy();
                 }
                 break;
             }
+        }
+
+        //TODO CHOOSE DEPUTY
+    }
+
+    private synchronized void checkTimeout() {
+        long curTime = System.currentTimeMillis();
+        pendingMessages.entrySet().removeIf(entry -> {
+            boolean expired = curTime - entry.getValue().getFirstTime() > gameState.getConfig().getNodeTimeoutMs();
+            if (expired) {
+                SnakesProto.GamePlayer toDelete = getPlayerById(entry.getValue().getReceiverId());
+
+                if (toDelete != null) {
+                    //System.out.println("GOING TO REMOVE PLAYER");
+                    playersToRemove.add(toDelete);
+                }
+                if (!role.equals(SnakesProto.NodeRole.MASTER)) {
+                    System.out.println("setting new master!!!!!");
+                    setNewMaster();
+                }
+            }
+            return expired;
+        });
+        try {
+            for (Map.Entry<Long, PacketUniqueID> entry : pendingMessages.entrySet()) {
+                if (curTime - entry.getValue().getLastTime() > gameState.getConfig().getPingDelayMs()) {
+                    entry.getValue().setLastTime(curTime);
+                    //System.out.println(entry.getValue().getPacket());
+                    //System.out.println(entry.getValue().getFirstTime());
+                    //System.out.println(entry.getValue().getReceiverId());
+                    //System.out.println(entry.getValue().getPacket().getSocketAddress());
+                    unicastSocket.send(entry.getValue().getPacket());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(e.getLocalizedMessage());
         }
     }
 
 
     private void handlePendingMessages() {
         while (!Thread.currentThread().isInterrupted()) {
-            long curTime = System.currentTimeMillis();
-            pendingMessages.entrySet().removeIf(entry -> {
-                boolean result = curTime - entry.getValue().getFirstTime() > gameState.getConfig().getNodeTimeoutMs();
-                if (result) {
-                    System.out.println("REMOVING PLAYER");
-                    playersToRemove.add(getPlayerById(entry.getValue().getReceiverId()));
-
-                    if (!role.equals(SnakesProto.NodeRole.MASTER)) {
-                        setNewMaster();
-                    }
-                }
-                return result;
-            });
-            try {
-                //synchronized (pendingMessages) {
-                    for (Map.Entry<Long, PacketUniqueID> entry : pendingMessages.entrySet()) {
-
-                        if (curTime - entry.getValue().getLastTime() > gameState.getConfig().getPingDelayMs()) {
-                            entry.getValue().setLastTime(curTime);
-                            unicastSocket.send(entry.getValue().getPacket());
-                        }
-                    }
-               // }
-            } catch (IOException e) {
-                System.out.println(e.getLocalizedMessage());
-            }
+            checkTimeout();
         }
     }
 
     private boolean isDeputySet() {
-        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+        for (SnakesProto.GamePlayer player : players.values()) {
             if (player.getRole().equals(SnakesProto.NodeRole.DEPUTY)) {
                 return true;
             }
@@ -860,12 +901,18 @@ public class Node extends Thread {
             }
         }
 
-        int newId = gameState.getPlayers().getPlayersCount();
+        //int newId = gameState.getPlayers().getPlayersCount();
+        int newId;
+        do {
+            newId = new Random().nextInt();
+        } while (idExists(newId));
         SnakesProto.GameState.Snake newSnake = createNewSnake(newId);
         if (newSnake == null) {
             sendError(ip, port);
             return;
         }
+
+
 
         SnakesProto.GamePlayer newPlayer = SnakesProto.GamePlayer
                 .newBuilder()
@@ -876,9 +923,8 @@ public class Node extends Thread {
                 .setRole(SnakesProto.NodeRole.NORMAL)
                 .setScore(2)
                 .build();
-        System.out.println("player added");
-        newPlayers.add(newPlayer);
-        newSnakes.add(newSnake);
+        players.put(newId, newPlayer);
+        snakes.add(newSnake);
         sendAck(msg, newPlayer.getId(), ip, port);
         if (!isDeputySet()) {
             sendRoleChange(newPlayer, role, SnakesProto.NodeRole.DEPUTY);
@@ -903,6 +949,7 @@ public class Node extends Thread {
         InetAddress ip = ((InetSocketAddress) sender).getAddress();
         int port = ((InetSocketAddress) sender).getPort();
         int playerId = getPlayerIdByAddress(ip, port);
+        //System.out.println("handling steer from " + playerId);
         changeSnakeDirection(playerId, msg.getSteer().getDirection());
         sendAck(msg, playerId, ip, port);
     }
@@ -917,29 +964,62 @@ public class Node extends Thread {
 
     }
 
-    private void handleAck(SnakesProto.GameMessage msg) {
+    private SnakesProto.GamePlayer setAddr(int id, String ip, int port) {
+        SnakesProto.GamePlayer old = getPlayerById(id);
+        //System.out.println("setted addr " + ip + "  to " + id);
+        return SnakesProto.GamePlayer.newBuilder()
+                .setId(id)
+                .setRole(old.getRole())
+                .setType(old.getType())
+                .setName(old.getName())
+                .setPort(port)
+                .setScore(old.getScore())
+                .setIpAddress(ip)
+                .build();
+    }
+
+    private void handleAck(SnakesProto.GameMessage msg, SocketAddress sender) {
         idInGame = msg.getReceiverId();
-        synchronized (pendingMessages) {
-            //System.out.println(msg.getMsgSeq() + " removed from pending queue");
-            pendingMessages.remove(msg.getMsgSeq());
+
+        //System.out.println("id = " + msg.getSenderId());
+        //System.out.println("handling ack from " + msg.getSenderId() + " to " + msg.getReceiverId());
+        if (getPlayerById(msg.getSenderId()).getIpAddress().isEmpty()) {
+            players.put(msg.getSenderId(), setAddr(msg.getSenderId(), ((InetSocketAddress) sender).getAddress().toString().substring(1), ((InetSocketAddress) sender).getPort()));
         }
+        //System.out.println(msg.getMsgSeq() + " removed from pending queue");
+        pendingMessages.remove(msg.getMsgSeq());
     }
 
 
     private void handleState(SnakesProto.GameMessage msg, SocketAddress sender) {
-        System.out.println("handling new State");
         int curVersion = gameState.getStateOrder();
         SnakesProto.GameState newState = msg.getState().getState();
         if (curVersion < newState.getStateOrder()) {
             gameState = newState;
             stateOrder = gameState.getStateOrder();
-            for (SnakesProto.GameState.Snake snake : gameState.getSnakesList()) {
+            snakes.clear();
+            snakes.addAll(gameState.getSnakesList());
+            for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+                SnakesProto.GamePlayer oldPlayer = players.get(player.getId());
+                SnakesProto.GamePlayer newPlayer = player;
+                if (oldPlayer != null) {
+                    String addr = oldPlayer.getIpAddress();
+                    if (!addr.isEmpty()) newPlayer = setAddr(player.getId(), addr, player.getPort());
+                    newPlayer = changeRole(newPlayer, player.getRole());
+                }
+                players.put(player.getId(), newPlayer);
+            }
+            food.clear();
+            food.addAll(gameState.getFoodsList());
+            for (SnakesProto.GameState.Snake snake : snakes) {
                 directionMap.put(snake.getPlayerId(), snake.getHeadDirection());
             }
         }
         int port = ((InetSocketAddress) sender).getPort();
         InetAddress ip = ((InetSocketAddress) sender).getAddress();
-        sendAck(msg, masterId, ip, port);
+        if (masterId != -1 && masterId != idInGame) {
+            sendAck(msg, masterId, masterAddr, masterPort);
+        }
     }
 
     private void handlePing(SnakesProto.GameMessage msg, SocketAddress sender) {
@@ -955,23 +1035,38 @@ public class Node extends Thread {
     }
 
     private void handleRoleChange(SnakesProto.GameMessage msg, SocketAddress sender) {
+
+        players.put(msg.getSenderId(), changeRole(getPlayerById(msg.getSenderId()), msg.getRoleChange().getSenderRole()));
+        if (msg.getRoleChange().getReceiverRole().equals(SnakesProto.NodeRole.MASTER) && !role.equals(SnakesProto.NodeRole.MASTER)) {
+            System.out.println("I am MASTER NOW !!!!!!!!!!!!!!");
+            System.out.println(players);
+            for(SnakesProto.GamePlayer player : players.values()) {
+                sendRoleChange(player, SnakesProto.NodeRole.MASTER, player.getRole());
+            }
+            setDeputy();
+        }
         role = msg.getRoleChange().getReceiverRole();
         if (role.equals(SnakesProto.NodeRole.MASTER)) masterId = idInGame;
         int port = ((InetSocketAddress) sender).getPort();
         InetAddress ip = ((InetSocketAddress) sender).getAddress();
 
+
         if (msg.getRoleChange().getSenderRole().equals(SnakesProto.NodeRole.MASTER)) {
             masterId = msg.getSenderId();
+            masterPort = port;
+            masterAddr = ip;
         }
         sendAck(msg, msg.getSenderId(), ip, port);
     }
 
-    private void handleReceivedPacket(DatagramPacket packet) {
+    private synchronized void handleReceivedPacket(DatagramPacket packet) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.getData());
              ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
-            masterAddr = packet.getAddress();
-            masterPort = packet.getPort();
+            //masterAddr = packet.getAddress();
+            //masterPort = packet.getPort();
+
             SnakesProto.GameMessage message = (SnakesProto.GameMessage) objectInputStream.readObject();
+            //System.out.println("received from " + packet.getSocketAddress() + " add = " + ((InetSocketAddress) packet.getSocketAddress()).getAddress() + " mes = " + message.getTypeCase());
             //System.out.println(message.getTypeCase());
             switch (message.getTypeCase()) {
                 case PING:
@@ -981,7 +1076,7 @@ public class Node extends Thread {
                     handleSteer(message, packet.getSocketAddress());
                     break;
                 case ACK:
-                    handleAck(message);
+                    handleAck(message, packet.getSocketAddress());
                     break;
                 case STATE:
                     handleState(message, packet.getSocketAddress());
@@ -1027,6 +1122,11 @@ public class Node extends Thread {
                 .setPlayers(knownGames.get(address).getPlayers())
                 .setStateOrder(-1)
                 .buildPartial();
+
+        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+            players.put(player.getId(), player);
+        }
+
         masterId = getMasterId();
         DatagramPacket packet = constructPacket(message, masterAddr, masterPort);
         long sendTime = System.currentTimeMillis();
@@ -1078,7 +1178,7 @@ public class Node extends Thread {
         announceSender = new Thread(this::sendAnnouncements);
         pendingHandler = new Thread(this::handlePendingMessages);
         unicastListener = new Thread(this::listenUnicast);
-        pingSender = new Thread(this::sendPings);
+        pingSender = new Thread(this::keepAlive);
         announceSender.start();
         pendingHandler.start();
         unicastListener.start();
@@ -1099,11 +1199,14 @@ public class Node extends Thread {
         pendingHandler.interrupt();
         unicastListener.interrupt();
         pingSender.interrupt();
-        unicastSocket.close();
+        if (unicastSocket != null) {
+            unicastSocket.close();
+        }
 
         role = SnakesProto.NodeRole.VIEWER;
-        newPlayers.clear();
-        newSnakes.clear();
+        players.clear();
+        snakes.clear();
+        food.clear();
         playersToRemove.clear();
         msgSeq = 0;
         directionMap.clear();
@@ -1118,7 +1221,7 @@ public class Node extends Thread {
     boolean createGame(int width, int height, int foodStatic, float foodPerPlayer, int stateDelayMs, float deadProbFood, int pingDelayMs, int nodeTimeoutMs) {
         init();
         idInGame = 0;
-        masterId = -1;
+        masterId = 0;
         SnakesProto.GameState.Snake snake = createNewSnake(idInGame);
         if (snake == null) {
             exitGame();
@@ -1157,6 +1260,11 @@ public class Node extends Thread {
                 )
                 .setStateOrder(0)
                 .build();
+
+        for (SnakesProto.GamePlayer player : gameState.getPlayers().getPlayersList()) {
+            players.put(player.getId(), player);
+        }
+        snakes.addAll(gameState.getSnakesList());
         synchronized (sync) {
             inGame = true;
         }
@@ -1216,11 +1324,14 @@ public class Node extends Thread {
 
     private SnakesProto.NodeRole role = SnakesProto.NodeRole.VIEWER;
 
+    private Map<Integer, SnakesProto.GamePlayer> deadPlayers = new HashMap<>();
     private List<SnakesProto.GameState.Coord> removedFood = new LinkedList<>();
     private final List<SnakesProto.GamePlayer> playersToRemove = new LinkedList<>();
     private Map<Integer, Long> lastSentMessage = new HashMap<>();
-    private final List<SnakesProto.GameState.Snake> newSnakes = new LinkedList<>();
-    private List<SnakesProto.GamePlayer> newPlayers = new LinkedList<>();
+    private List<SnakesProto.GameState.Coord> food = new LinkedList<>();
+    private int deputyId = -1;
+    private List<SnakesProto.GameState.Snake> snakes = new LinkedList<>();
+    private Map<Integer, SnakesProto.GamePlayer> players = new HashMap<>();
     private Map<Integer, SnakesProto.Direction> directionMap = new HashMap<>();
     private DatagramSocket unicastSocket;
     private MulticastSocket multicastSocket;

@@ -13,15 +13,16 @@ import java.util.List;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws  Exception {
+    public void start(Stage primaryStage) throws Exception {
         List<String> params = getParameters().getRaw();
         if (params.size() < 2) {
             System.out.println("(port, name) expected");
         }
+
         Node node = new Node(Integer.parseInt(params.get(0)), params.get(1));
         node.start();
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("mainScene.fxml"));
-        loader.setControllerFactory(c-> new MainSceneController(node));
+        loader.setControllerFactory(c -> new MainSceneController(node));
         Parent root = (Parent) loader.load();
         primaryStage.setOnCloseRequest(windowEvent -> {
             System.out.println("closing...");
@@ -38,5 +39,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+
     }
 }
