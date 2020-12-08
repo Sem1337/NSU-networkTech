@@ -1,15 +1,16 @@
 
-P
-java:S1199Ç"-Extract this nested code block into a method.(é… ƒøÿÿÿÿ8·“¦Šâ.
-K
-java:S1199Ë"-Extract this nested code block into a method.(¼°âŞ8·“¦Šâ.
-w
-java:S14506"URemove the "drawer" field and declare it as a local variable in the relevant methods.(ˆñÑüÿÿÿÿ8†ĞŒâ.
-P
-java:S1199Ó"-Extract this nested code block into a method.(Î—­Šşÿÿÿÿ8·“¦Šâ.
 W
 java:S1128"5Remove this unused import 'javafx.event.ActionEvent'.(î•¯¼ıÿÿÿÿ8›Ù‰â.
+K
+java:S1199Ú"-Extract this nested code block into a method.(¼°âŞ8·“¦Šâ.
 P
-java:S1199Ï"-Extract this nested code block into a method.(º•ùÿÿÿÿ8·“¦Šâ.
+java:S1199Ş"-Extract this nested code block into a method.(º•ùÿÿÿÿ8·“¦Šâ.
 P
-java:S1199Ã"-Extract this nested code block into a method.(«Ø•¥úÿÿÿÿ8·“¦Šâ.
+java:S1199â"-Extract this nested code block into a method.(Î—­Šşÿÿÿÿ8·“¦Šâ.
+P
+java:S1199Ò"-Extract this nested code block into a method.(«Ø•¥úÿÿÿÿ8·“¦Šâ.
+X	java:S125u"<This block of commented-out lines of code should be removed.(·¿Š¦8¢…Ó›ä.
+w
+java:S1450:"URemove the "drawer" field and declare it as a local variable in the relevant methods.(ˆñÑüÿÿÿÿ8†ĞŒâ.
+P
+java:S1199Ö"-Extract this nested code block into a method.(é… ƒøÿÿÿÿ8·“¦Šâ.

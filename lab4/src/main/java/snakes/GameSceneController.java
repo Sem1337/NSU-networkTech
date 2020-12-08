@@ -10,6 +10,10 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import snakes.proto.SnakesProto;
 
 import java.net.URL;
@@ -76,13 +80,16 @@ public class GameSceneController extends ScreenController {
 
     private void drawConfig() {
         Label configLabel = new Label(getNode().getGameState().getConfig().toString());
+        configLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
         infoList.getChildren().add(configLabel);
     }
 
     private void updateScoreBoard() {
         scoreBoard.getChildren().clear();
         for (SnakesProto.GamePlayer player : getNode().getGameState().getPlayers().getPlayersList()) {
-            scoreBoard.getChildren().add(new Label(player.getName() + " " + player.getScore()));
+            Label label = new Label(player.getName() + " " + player.getScore());
+            label.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
+            scoreBoard.getChildren().add(label);
         }
     }
 
@@ -103,10 +110,12 @@ public class GameSceneController extends ScreenController {
         beginX = (int) snakeField.getLayoutX() + (fullWidth - fieldWidth) / 2;
         beginY = (int) snakeField.getLayoutY() + (fullHeight - fieldHeight) / 2;
 
-        gc.setFill(Color.AQUA);
+        gc.setFill(Paint.valueOf("#2E3532"));
+        gc.fillRect(0,0, snakeField.getWidth(), snakeField.getHeight());
+
+        gc.setFill(Paint.valueOf("#D2D4C8"));
+        //gc.setFill(Color.AQUA);
         gc.fillRect(beginX, beginY, fieldWidth, fieldHeight);
-        gc.setFill(Color.RED);
-        gc.setStroke(Color.GREEN);
     }
 
     private void drawSnakes() {

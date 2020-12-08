@@ -128,7 +128,7 @@ public class Node extends Thread {
         try {
             masterAddr = InetAddress.getByName(deputy.getIpAddress());
         } catch (UnknownHostException e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("notify deputy" + e.getLocalizedMessage());
         }
         players.put(deputy.getId(), changeRole(deputy, SnakesProto.NodeRole.MASTER));
         System.out.println("notifying deputy from " + role + " with id = " + idInGame);
@@ -337,6 +337,9 @@ public class Node extends Thread {
                     continue;
                 }
                 SnakesProto.GameState.Coord p2 = addOffset(p1, snakePoint);
+                if (snake.getPlayerId() == ownerId && it == 1 && isIntersectWithSegment(head, movePoint(p1, invertDirection(snake.getHeadDirection())),p2)) {
+                    return true;
+                }
 
                 if (!(snake.getPlayerId() == ownerId && it == 1) && (isIntersectWithSegment(head, p1, p2))) {
                     return true;
@@ -561,10 +564,12 @@ public class Node extends Thread {
 
     private DatagramPacket constructPacket(SnakesProto.GameMessage message, InetAddress ip, int port) {
         byte[] sendBuffer;
+
         DatagramPacket packet = null;
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); ObjectOutputStream oo = new ObjectOutputStream(outputStream)) {
             oo.writeObject(message);
-            sendBuffer = outputStream.toByteArray();
+            sendBuffer = message.toByteArray();
+            //sendBuffer = outputStream.toByteArray();
             packet = new DatagramPacket(sendBuffer, sendBuffer.length, ip, port);
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
@@ -690,6 +695,7 @@ public class Node extends Thread {
         //System.out.println("putt + " + packet.getSocketAddress());
         pendingMessages.put(message.getMsgSeq(), new PacketUniqueID(sendTime, sendTime, packet, receiverId));
         try {
+            if (packet.getAddress() == null || packet.getData() == null) return;
             unicastSocket.send(packet);
         } catch (IOException e) {
             System.out.println(e.getLocalizedMessage());
@@ -718,7 +724,7 @@ public class Node extends Thread {
                 }
             }
         } catch (UnknownHostException e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("pings " + e.getLocalizedMessage());
         }
     }
 
@@ -811,14 +817,14 @@ public class Node extends Thread {
 
     private void setNewMaster() {
         for (SnakesProto.GamePlayer player : players.values()) {
-            System.out.println(player.getRole() + "  " + player.getId());
+            //System.out.println(player.getRole() + "  " + player.getId() + " " + player.getIpAddress() + " " + player.getName());
             if (player.getRole().equals(SnakesProto.NodeRole.DEPUTY)) {
                 masterId = player.getId();
                 masterPort = player.getPort();
                 try {
                     masterAddr = InetAddress.getByName(player.getIpAddress());
                 } catch (UnknownHostException e) {
-                    System.out.println(e.getLocalizedMessage());
+                    System.out.println("set master " + e.getLocalizedMessage());
                 }
                 players.put(masterId, changeRole(player, SnakesProto.NodeRole.MASTER));
                 if (masterId == idInGame) {
@@ -864,6 +870,7 @@ public class Node extends Thread {
                     //System.out.println(entry.getValue().getFirstTime());
                     //System.out.println(entry.getValue().getReceiverId());
                     //System.out.println(entry.getValue().getPacket().getSocketAddress());
+                    if (entry.getValue().getPacket().getAddress() == null || entry.getValue().getPacket().getData() == null) return;
                     unicastSocket.send(entry.getValue().getPacket());
                 }
             }
@@ -1061,11 +1068,16 @@ public class Node extends Thread {
 
     private synchronized void handleReceivedPacket(DatagramPacket packet) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.getData());
-             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
-            //masterAddr = packet.getAddress();
-            //masterPort = packet.getPort();
+             /*ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)*/) {
+            //SnakesProto.GameMessage message = (SnakesProto.GameMessage) objectInputStream.readObject();
 
-            SnakesProto.GameMessage message = (SnakesProto.GameMessage) objectInputStream.readObject();
+            byte[] bytes = new byte[packet.getLength()];
+            System.arraycopy(packet.getData(), 0, bytes, 0, packet.getLength());
+            SnakesProto.GameMessage message = SnakesProto.GameMessage.parseFrom(bytes);
+
+
+
+
             //System.out.println("received from " + packet.getSocketAddress() + " add = " + ((InetSocketAddress) packet.getSocketAddress()).getAddress() + " mes = " + message.getTypeCase());
             //System.out.println(message.getTypeCase());
             switch (message.getTypeCase()) {
@@ -1097,7 +1109,7 @@ public class Node extends Thread {
                     break;
             }
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException  e) {
             e.printStackTrace();
         }
     }

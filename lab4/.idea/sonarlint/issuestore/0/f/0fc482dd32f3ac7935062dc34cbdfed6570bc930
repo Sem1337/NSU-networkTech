@@ -1,26 +1,43 @@
 
-^	java:S125Ô"<This block of commented-out lines of code should be removed.(ù»†øÿÿÿÿ8×’¿÷ã.
-Y	java:S125˜"<This block of commented-out lines of code should be removed.(†Áß¬8×’¿÷ã.
-Y	java:S125Š"<This block of commented-out lines of code should be removed.(‘ªŒ8×’¿÷ã.
-^	java:S125º"<This block of commented-out lines of code should be removed.(äöáùøÿÿÿÿ8ÑÊ¸øã.
-X
-java:S1141¥"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8×’¿÷ã.
-f
-java:S2259û"CA "NullPointerException" could be thrown; "snake" is nullable here.(¡æüÿÿÿÿ8×’¿÷ã.
-Y	java:S125Ú"<This block of commented-out lines of code should be removed.(Ç¥«¼8×’¿÷ã.
-J
-java:S1068Ú	",Remove this unused "deputyId" private field.(ïØ°¥8×’¿÷ã.
-Y	java:S125"<This block of commented-out lines of code should be removed.(€À•É8×’¿÷ã.
-Y	java:S125•"<This block of commented-out lines of code should be removed.(•Šºá8×’¿÷ã.
+Y	java:S125"<This block of commented-out lines of code should be removed.(Ç¥«¼8”œŠ–ä.
+Y	java:S125°"<This block of commented-out lines of code should be removed.(ÅÉ¡ê8î¸ŠŸä.
+^	java:S125´"<This block of commented-out lines of code should be removed.(× ¾ùÿÿÿÿ8ÌÉˆŸä.
 s
-java:S2236¦"PRefactor the synchronisation mechanism to not use a Thread instance as a monitor(‡†„‹ıÿÿÿÿ8×’¿÷ã.
+java:S2236Œ	"PRefactor the synchronisation mechanism to not use a Thread instance as a monitor(‡†„‹ıÿÿÿÿ8¬¡ŠŸä.
+g
+java:S2259º"DA "NullPointerException" could be thrown; "packet" is nullable here.(ç§Ê‹ıÿÿÿÿ8ı‘€ ä.
+Y	java:S125ä"<This block of commented-out lines of code should be removed.(†Áß¬8”œŠ–ä.
+Y	java:S125û"<This block of commented-out lines of code should be removed.(•Šºá8¬¡ŠŸä.
 E
-java:S1481‡"'Remove this unused "it" local variable.(´©°õ8×’¿÷ã.
-m
-java:S2236="PRefactor the synchronisation mechanism to not use a Thread instance as a monitor(ã­Ó 8çÜş–ã.
+java:S1481¡"'Remove this unused "it" local variable.(´©°õ8”œŠ–ä.
+Y	java:S107Ñ	"<Method has 8 parameters, which is greater than 7 authorized.(ÃÒ¼¿8¬¡ŠŸä.
+Y	java:S125·"<This block of commented-out lines of code should be removed.(€ºÃÜ8”œŠ–ä.
+^	java:S125¼"<This block of commented-out lines of code should be removed.(æ¬ÂÇüÿÿÿÿ8³áóä.
+^	java:S125¿"<This block of commented-out lines of code should be removed.(Ëğçšûÿÿÿÿ8”œŠ–ä.
+G
+java:S1481")Remove this unused "port" local variable.(š”Ş–8ñô‰–ä.
+J
+java:S1068À
+",Remove this unused "deputyId" private field.(ïØ°¥8¬¡ŠŸä.
+^	java:S125à"<This block of commented-out lines of code should be removed.(±‡ìÆÿÿÿÿÿ8¬¡ŠŸä.
+Y	java:S125¥"<This block of commented-out lines of code should be removed.(‘ªŒ8”œŠ–ä.
+^	java:S125³"<This block of commented-out lines of code should be removed.(åÀìÄøÿÿÿÿ8”œŠ–ä.
+X	java:S125*"<This block of commented-out lines of code should be removed.(†ûùã8àÏà”ä.
+^	java:S125ß"<This block of commented-out lines of code should be removed.(ß“¬ÿÿÿÿÿ8Ö™˜ä.
+D
+java:S1481‚"'Remove this unused "ip" local variable.(í³L8”œŠ–ä.
 U
-java:S1135›"2Complete the task associated to this TODO comment.(Ûİ¡íúÿÿÿÿ8×’¿÷ã.
-Y	java:S125Ñ"<This block of commented-out lines of code should be removed.(ñ¯ò¾8ïÚøã.
-{	java:S135¦"YReduce the total number of break and continue statements in this loop to use at most one.(“öÖøÿÿÿÿ8×’¿÷ã.
-^	java:S125ú"<This block of commented-out lines of code should be removed.(±‡ìÆÿÿÿÿÿ8×’¿÷ã.
-Y	java:S107ë"<Method has 8 parameters, which is greater than 7 authorized.(ÃÒ¼¿8×’¿÷ã.
+java:S1135Ì"2Complete the task associated to this TODO comment.(Ûİ¡íúÿÿÿÿ8”œŠ–ä.
+^	java:S125Ğ"<This block of commented-out lines of code should be removed.(ŒÒáüÿÿÿÿ8”œŠ–ä.
+Y	java:S125Å"<This block of commented-out lines of code should be removed.(€À•É8”œŠ–ä.
+^	java:S125¹"<This block of commented-out lines of code should be removed.(íâÌßÿÿÿÿÿ8¬¡ŠŸä.
+X
+java:S1128";Remove this unused import 'javax.management.relation.Role'.(ëÎåè8ÁŠ”ä.
+Y	java:S125Š"<This block of commented-out lines of code should be removed.(Ê¬Ü8”œŠ–ä.
+^	java:S125Æ"<This block of commented-out lines of code should be removed.(€ª†¶ûÿÿÿÿ8”œŠ–ä.
+S
+java:S1854‚"6Remove this useless assignment to local variable "ip".(í³L8”œŠ–ä.
+X	java:S125å"<This block of commented-out lines of code should be removed.(‘¿Ğ8”œŠ–ä.
+V
+java:S1854"8Remove this useless assignment to local variable "port".(š”Ş–8ñô‰–ä.
+X	java:S125×"<This block of commented-out lines of code should be removed.(ƒÔ¢38äå‡Ÿä.
