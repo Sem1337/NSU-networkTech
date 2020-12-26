@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="dnsjava:dnsjava:3.3.1" type="repository">
+    <properties maven-id="dnsjava:dnsjava:3.3.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/dnsjava/dnsjava/3.3.1/dnsjava-3.3.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,7 +1,7 @@
 
-V
-java:S1128"9Remove this unused import 'com.google.protobuf.MapEntry'.(‹ñÏÌ8…ıùá.
 I
 java:S1602-",Remove useless curly braces around statement(®©„¤8Ã¬€â.
 h
 java:S1192Z"FDefine a constant instead of duplicating this literal "Arial" 4 times.(òœ½úüÿÿÿÿ8òıî›ä.
+V
+java:S1128"9Remove this unused import 'com.google.protobuf.MapEntry'.(‹ñÏÌ8…ıùá.

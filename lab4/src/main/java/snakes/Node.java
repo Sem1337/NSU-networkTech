@@ -997,7 +997,6 @@ public class Node extends Thread {
         pendingMessages.remove(msg.getMsgSeq());
     }
 
-
     private void handleState(SnakesProto.GameMessage msg, SocketAddress sender) {
         int curVersion = gameState.getStateOrder();
         SnakesProto.GameState newState = msg.getState().getState();
@@ -1078,7 +1077,7 @@ public class Node extends Thread {
 
 
 
-            //System.out.println("received from " + packet.getSocketAddress() + " add = " + ((InetSocketAddress) packet.getSocketAddress()).getAddress() + " mes = " + message.getTypeCase());
+            System.out.println("received from " + packet.getSocketAddress() + " add = " + ((InetSocketAddress) packet.getSocketAddress()).getAddress() + " mes = " + message.getTypeCase());
             //System.out.println(message.getTypeCase());
             switch (message.getTypeCase()) {
                 case PING:

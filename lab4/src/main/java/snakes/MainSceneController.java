@@ -86,14 +86,14 @@ public class MainSceneController extends ScreenController {
 
     private HBox constructGameRecord(SocketAddress address, String masterName, Integer playersCount, String size, String foodParam) {
         HBox gameRecord = new HBox();
-        Label masterIdLabel = new Label(masterName + " " + address);
+        Label masterIdLabel = new Label(masterName + " " + address + "   ");
         masterIdLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
 
-        Label playersCountLabel = new Label(String.valueOf(playersCount));
+        Label playersCountLabel = new Label(playersCount + "   ");
         playersCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
-        Label sizeLabel = new Label(size);
+        Label sizeLabel = new Label(size + "    ");
         sizeLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
-        Label foodParamLabel = new Label(foodParam);
+        Label foodParamLabel = new Label(foodParam + "    ");
         foodParamLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
         Button joinButton = new Button("join");
 

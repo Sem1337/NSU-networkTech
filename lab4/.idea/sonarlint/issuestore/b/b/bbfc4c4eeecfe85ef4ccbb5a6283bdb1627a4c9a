@@ -1,11 +1,11 @@
 
+w
+java:S1905"URemove this unnecessary cast to "org.sonar.java.resolve.Symbols$UnknownType@256002c".(èÇ„Ôøÿÿÿÿ8æÐ¹šá.
+O
+java:S1199#"-Extract this nested code block into a method.(Ö¦Å­ÿÿÿÿÿ8Ü…Óšá.
 M
 java:S1128	"+Remove this unused import 'lombok.NonNull'.(¦¸©—ýÿÿÿÿ8ÌýèÎá.
 J
-java:S1199)"-Extract this nested code block into a method.(ãà§‡8Ü…Óšá.
-O
-java:S1199#"-Extract this nested code block into a method.(Ö¦Å­ÿÿÿÿÿ8Ü…Óšá.
-x
-java:S1905"VRemove this unnecessary cast to "org.sonar.java.resolve.Symbols$UnknownType@3711f39d".(èÇ„Ôøÿÿÿÿ8æÐ¹šá.
-J
 java:S1199&"-Extract this nested code block into a method.(’Ó€ã8Ü…Óšá.
+J
+java:S1199)"-Extract this nested code block into a method.(ãà§‡8Ü…Óšá.
